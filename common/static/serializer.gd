@@ -31,6 +31,7 @@ func serialize(nodes: Array) -> Dictionary:
 # Inverse of serialize, takes a dictionary and returns a list of Godot nodes.
 func deserialize(data: Dictionary) -> Array:
 	print("in the deserialize function")
+	print(data)
 	var result: Array = []
 	_serialized_resources = data["resources"]
 	# Deserialize resources here?
