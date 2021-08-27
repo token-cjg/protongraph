@@ -12,6 +12,7 @@ var _serialized_resources: Dictionary
 
 # Takes a list of nodes and serialize them all in a dictionary.
 func serialize(nodes: Array) -> Dictionary:
+	print("in the serialize function")
 	var _resources = []
 	var _serialized_resources = {}
 
@@ -29,6 +30,7 @@ func serialize(nodes: Array) -> Dictionary:
 
 # Inverse of serialize, takes a dictionary and returns a list of Godot nodes.
 func deserialize(data: Dictionary) -> Array:
+	print("in the deserialize function")
 	var result: Array = []
 	_serialized_resources = data["resources"]
 	# Deserialize resources here?
