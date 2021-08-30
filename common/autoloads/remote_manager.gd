@@ -36,24 +36,33 @@ func _set_inputs(tpl: Template, inputs: Array) -> void:
 
 
 func _on_build_requested(id: int, path: String, args: Dictionary) -> void:
+	print("in the _on_build_requested function")
+	print(id)
 	var tpl: Template
 	if _peers.has(id):
 		tpl = _peers[id]["template"]
+		print(tpl)
 	else:
 		tpl = Template.new()
 		add_child(tpl)
 		_peers[id] = {}
 		_peers[id]["template"] = tpl
+		print(tpl)
 
 	if tpl._loaded_template_path != path:
+		print("template path does not match loaded template path")
+		print(path)
 		tpl.load_from_file(path)
 
 	if not tpl._template_loaded:
 		return
 
+	print("now loaded the template path")
 	_set_inspector_values(tpl, args["inspector"])
 	_set_inputs(tpl, args["inputs"])
 
+	print("About to disptach the remote build signal")
+	print(id)
 	GlobalEventBus.dispatch("remote_build_started", [id])
 	tpl.generate(true)
 	yield(tpl, "build_completed")
