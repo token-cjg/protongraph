@@ -25,7 +25,9 @@ func _init() -> void:
 
 
 func _generate_outputs() -> void:
+	print("in _generate_outputs for Sample Along Curve node")
 	var paths := get_input(0)
+	print(paths)
 	if not paths or paths.size() == 0:
 		return
 
