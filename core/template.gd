@@ -400,9 +400,13 @@ func _run_generation_threaded(_var = null) -> void:
 			call_deferred("emit_signal", "thread_completed")
 			return
 
+	print("in _run_generation_threaded")
 	_output = []
 	var node_output
 	for node in _output_nodes:
+		print("getting data from output_node")
+		print(node)
+		print(node.name)
 		if not node:
 			_output_nodes.erase(node)
 			continue

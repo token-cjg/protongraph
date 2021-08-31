@@ -54,7 +54,6 @@ func _on_build_requested(id: int, path: String, args: Dictionary) -> void:
 	if not tpl._template_loaded:
 		return
 
-	print("now loaded the template path")
 	_set_inspector_values(tpl, args["inspector"])
 	_set_inputs(tpl, args["inputs"])
 
