@@ -39,6 +39,7 @@ func _on_remote_build_requested(id, msg: Dictionary) -> void:
 	var inspector: Array = msg["inspector"] if msg.has("inspector") else null
 	var inputs := []
 	if msg.has("inputs"):
+		print("in _on_remote_build_requested")
 		for input in msg["inputs"]:
 			inputs.append(_node_serializer.deserialize(input))
 	var args := {

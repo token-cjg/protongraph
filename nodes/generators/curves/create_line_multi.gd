@@ -20,6 +20,7 @@ func _init() -> void:
 
 
 func _generate_outputs() -> void:
+	print("in _generate_outputs for Create line multi node")
 	var length: float = get_input_single(0, 1.0)
 	var centered: bool = get_input_single(1, false)
 	var axis: Vector3 = get_input_single(2, Vector3.UP)

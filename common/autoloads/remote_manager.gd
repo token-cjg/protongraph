@@ -28,6 +28,8 @@ func _set_inspector_values(tpl: Template, values: Array) -> void:
 
 
 func _set_inputs(tpl: Template, inputs: Array) -> void:
+	print("in the _set_inputs function")
+	print(inputs)
 	if not inputs:
 		return
 	for input in inputs:
@@ -37,6 +39,7 @@ func _set_inputs(tpl: Template, inputs: Array) -> void:
 
 func _on_build_requested(id: int, path: String, args: Dictionary) -> void:
 	print("in the _on_build_requested function")
+	print(args)
 	var tpl: Template
 	if _peers.has(id):
 		tpl = _peers[id]["template"]
