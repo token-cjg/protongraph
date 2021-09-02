@@ -16,7 +16,6 @@ func _init() -> void:
 
 
 func _generate_outputs() -> void:
-	print("in _generate_outputs for Remote Input 3D node")
 	var name: String = get_input_single(0, "")
 	var children_only: bool = get_input_single(1, false)
 	var placeholder = get_input_single(2)
@@ -29,3 +28,5 @@ func _generate_outputs() -> void:
 		output[0] = input.get_children()
 	else:
 		output[0].push_back(input)
+	print("in _generate_outputs for Remote Input 3D node")
+	print(output[0])

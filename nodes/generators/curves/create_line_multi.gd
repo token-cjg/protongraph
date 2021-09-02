@@ -20,7 +20,6 @@ func _init() -> void:
 
 
 func _generate_outputs() -> void:
-	print("in _generate_outputs for Create line multi node")
 	var length: float = get_input_single(0, 1.0)
 	var centered: bool = get_input_single(1, false)
 	var axis: Vector3 = get_input_single(2, Vector3.UP)
@@ -43,5 +42,6 @@ func _generate_outputs() -> void:
 		path.curve.add_point(end)
 		path.transform = o.transform
 		output[0].push_back(path)
-
+	print("in _generate_outputs for Create line multi node")
+	print(output[0])
 

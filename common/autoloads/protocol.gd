@@ -37,20 +37,20 @@ func _on_remote_build_requested(id, msg: Dictionary) -> void:
 
 	var path: String = msg["path"]
 	var inspector: Array = msg["inspector"] if msg.has("inspector") else null
-	var inputs := []
-	if msg.has("inputs"):
-		print("in _on_remote_build_requested")
-		for input in msg["inputs"]:
-			inputs.append(_node_serializer.deserialize(input))
+	var generator_payload_data_array := []
+	if msg.has("inputs"): # actually the generator payload of form [{ "node": [{inputs}], "resources": {}}]
+		for generator_payload_data in msg["inputs"]: # of form { "node": [{inputs}], "resources": {}}
+			print("in _on_remote_build_requested")
+			generator_payload_data_array.append(_node_serializer.deserialize(generator_payload_data))
 	var args := {
 		"inspector": inspector,
-		"inputs": inputs
+		"generator_payload_data_array": generator_payload_data_array
 	}
 	GlobalEventBus.dispatch("build_for_remote", [id, path, args])
 
 
 func _on_remote_build_completed(id, data: Array) -> void:
-	print("in the _on_remote_build_completed function")
+	print("in the protocol#_on_remote_build_completed function")
 	print(data)
 	var msg = {"type": "build_completed"}
 	msg["data"] = _node_serializer.serialize(data)
