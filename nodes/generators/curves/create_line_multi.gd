@@ -28,6 +28,7 @@ func _generate_outputs() -> void:
 	if not origins:
 		return
 
+	print("in create multiple lines, printing origins")
 	for o in origins:
 		var start = Vector3.ZERO
 		var end = axis * length
