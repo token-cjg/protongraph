@@ -4,7 +4,15 @@ extends Node
 # Helper to serialize and deserialize node trees to json objects.
 
 
+# _resources consists of an array of Dictionaries of the form [ { fence_planks: <fence_planks_node_path> }, { Path: <Path_node_path> }]
 var _resources: Array
+# _serialized_resources consists of an output Dictionary of Dictionaries looking something like (tbc)
+# {
+#	fence_planks: { callback: { fence_planks: <fence_planks_node_path> }, generated_nodes: [ fence_plank_1, fence_plank_2, fence_plank_3 ]},
+#   Path: { ... }
+# }
+# The purpose of the structure of this data is so that the client can then render meshes based on the callback at the generated_nodes
+# associated to said input node in { fence_planks, Path } per this example.
 var _serialized_resources: Dictionary
 
 
@@ -36,7 +44,8 @@ func deserialize(data: Dictionary) -> Array:
 	# Deserialize resources here?
 
 	for node in data["node"]:
-		print(node.name)
+		print("Deserializing. Node name is:", node.name)
+		print("Deserializing. Node path is:", node.node_path_input)
 		result.append(_deserialize_recursive(node))
 
 	return result
@@ -76,7 +85,6 @@ func _serialize_recursive(node: Node) -> Dictionary:
 
 	return dict
 
-
 func _deserialize_recursive(data: Dictionary) -> Node:
 	var node
 	match data["type"]:
@@ -102,6 +110,9 @@ func _deserialize_recursive(data: Dictionary) -> Node:
 	if "name" in data:
 		node.name = data["name"]
 
+	# Important for callback within Godot Client after procedural generation
+	# of scenetree for associated Protongraph template.
+	_resources.append(data["node_path_input"])
 	return node
 
 
