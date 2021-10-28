@@ -4,17 +4,19 @@ extends Node
 # Helper to serialize and deserialize node trees to json objects.
 
 
-# _resources consists of an array of Dictionaries of the form [ { fence_planks: <fence_planks_node_path> }, { Path: <Path_node_path> }]
 var _resources: Array
-# _serialized_resources consists of an output Dictionary of Dictionaries looking something like (tbc)
+var _serialized_resources: Dictionary
+
+# _node_metadata consists of an array of Dictionaries of the form [ { fence_planks: <fence_planks_node_path> }, { Path: <Path_node_path> }]
+var _node_metadata: Array
+# _serialized_node_metadata consists of an output Dictionary of Dictionaries looking something like (tbc)
 # {
 #	fence_planks: { callback: { fence_planks: <fence_planks_node_path> }, generated_nodes: [ fence_plank_1, fence_plank_2, fence_plank_3 ]},
 #   Path: { ... }
 # }
 # The purpose of the structure of this data is so that the client can then render meshes based on the callback at the generated_nodes
 # associated to said input node in { fence_planks, Path } per this example.
-var _serialized_resources: Dictionary
-
+var _serialized_node_metadata: Dictionary
 
 # -- Public API --
 
@@ -46,6 +48,7 @@ func deserialize(data: Dictionary) -> Array:
 	for node in data["node"]:
 		print("Deserializing. Node name is:", node.name)
 		print("Deserializing. Node path is:", node.node_path_input)
+		_node_metadata.append(node.node_path_input)
 		result.append(_deserialize_recursive(node))
 
 	return result
@@ -170,6 +173,8 @@ func _serialize_node_mesh_instance(mesh_instance: MeshInstance) -> Dictionary:
 
 
 func _deserialize_mesh_instance(data: Dictionary) -> MeshInstance:
+	print("in _deserialize_mesh_instance")
+	#print(data["mesh"])
 	var mi = MeshInstance.new()
 	mi.transform = _deserialize_transform(data)
 
