@@ -351,7 +351,8 @@ func get_output() -> Array:
 func get_remote_output() -> Array:
 	var res = []
 	for node in _sync_nodes:
-		res.push_back(node.get_output(0))
+		if node:
+			res += node.get_output(0)
 	return res
 
 
@@ -366,6 +367,7 @@ func get_remote_input(name: String):
 
 
 func set_remote_input(name: String, value):
+	print("in the set_remote_input function")
 	_remote_inputs[name] = value
 
 
@@ -393,15 +395,34 @@ func _run_generation() -> void:
 
 # Useless parameter needed otherwise the thread wont run the function
 func _run_generation_threaded(_var = null) -> void:
+	if _remote_inputs.size() == 0:
+		if _template_loaded:
+			print("Error : No input node found in ", get_parent().get_name())
+			call_deferred("emit_signal", "thread_completed")
+			return
+	
+	for remote_input in _remote_inputs:
+		print("setting data in input_node")
+		print(remote_input)
+		if not remote_input:
+			_remote_inputs.erase(remote_input)
+			continue
+		# todo handle setting data in _input_nodes
+		# we need the index of the input as well as the data for it.
+
+
 	if _output_nodes.size() == 0:
 		if _template_loaded:
 			print("Error : No output node found in ", get_parent().get_name())
 			call_deferred("emit_signal", "thread_completed")
 			return
 
+	print("in _run_generation_threaded")
 	_output = []
 	var node_output
 	for node in _output_nodes:
+		print("getting data from output_node")
+		print(node.name)
 		if not node:
 			_output_nodes.erase(node)
 			continue

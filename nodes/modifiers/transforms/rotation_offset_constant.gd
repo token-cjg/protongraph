@@ -16,6 +16,7 @@ func _init() -> void:
 
 
 func _generate_outputs() -> void:
+	print("in _generate_outputs for Rotate Transforms node")
 	var nodes := get_input(0)
 	var amount: Vector3 = get_input_single(1, Vector3.ZERO)
 	var local_space: bool = get_input_single(2, true)

@@ -28,21 +28,30 @@ func _set_inspector_values(tpl: Template, values: Array) -> void:
 
 
 func _set_inputs(tpl: Template, inputs: Array) -> void:
+	print("in the remote_manager#_set_inputs function")
+	print(inputs)
 	if not inputs:
 		return
 	for input in inputs:
-		tpl.set_remote_input(input.name, input)
+		if input:
+			print("processing an input")
+			print(input)
+			tpl.set_remote_input(input.name, input)
 
 
 func _on_build_requested(id: int, path: String, args: Dictionary) -> void:
+	print("in the remote_manager#_on_build_requested function")
+	print(args)
 	var tpl: Template
 	if _peers.has(id):
 		tpl = _peers[id]["template"]
+		print(tpl)
 	else:
 		tpl = Template.new()
 		add_child(tpl)
 		_peers[id] = {}
 		_peers[id]["template"] = tpl
+		print(tpl)
 
 	if tpl._loaded_template_path != path:
 		tpl.load_from_file(path)
@@ -51,7 +60,9 @@ func _on_build_requested(id: int, path: String, args: Dictionary) -> void:
 		return
 
 	_set_inspector_values(tpl, args["inspector"])
-	_set_inputs(tpl, args["inputs"])
+	# select the first generator in the relevant array. TODO: find a way to select the appropriate one
+	# if we are invoking multiple generators in a single call to Protongraph
+	_set_inputs(tpl, args["generator_payload_data_array"][0]) 
 
 	GlobalEventBus.dispatch("remote_build_started", [id])
 	tpl.generate(true)

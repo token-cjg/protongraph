@@ -2,9 +2,13 @@ extends Node
 
 
 var _server: IPCServer
+var _node_serializer: NodeSerializer
 
 
 func _ready():
+	if not _node_serializer:
+		_node_serializer = NodeSerializer.new()
+
 	_start_server()
 	GlobalEventBus.register_listener(self, "remote_build_completed", "_on_remote_build_completed")
 
@@ -33,22 +37,21 @@ func _on_remote_build_requested(id, msg: Dictionary) -> void:
 
 	var path: String = msg["path"]
 	var inspector: Array = msg["inspector"] if msg.has("inspector") else null
-	var inputs := []
-	if msg.has("inputs"):
-		inputs = NodeSerializer.deserialize_all(msg["inputs"])
-
+	var generator_payload_data_array := []
+	if msg.has("inputs"): # actually the generator payload of form [{ "node": [{inputs}], "resources": {}}]
+		for generator_payload_data in msg["inputs"]: # of form { "node": [{inputs}], "resources": {}}
+			print("in _on_remote_build_requested")
+			generator_payload_data_array.append(_node_serializer.deserialize(generator_payload_data))
 	var args := {
 		"inspector": inspector,
-		"inputs": inputs
+		"generator_payload_data_array": generator_payload_data_array
 	}
 	GlobalEventBus.dispatch("build_for_remote", [id, path, args])
 
 
 func _on_remote_build_completed(id, data: Array) -> void:
+	print("in the protocol#_on_remote_build_completed function")
+	print(data)
 	var msg = {"type": "build_completed"}
-	msg["data"] = []
-	for output in data:
-		for node in output:
-			msg["data"].push_back(NodeSerializer.serialize(node))
-
+	msg["data"] = _node_serializer.serialize(data)
 	_server.send(id, msg)
