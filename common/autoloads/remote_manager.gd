@@ -56,6 +56,8 @@ func _set_resources(tpl: Template, inputs: Array, resources: Array, child_transv
 					print(input)
 					tpl.set_remote_resource(input.name, child_transversal, resource["resource_path"])
 				else if resource["children"]:
+					# TODO: generalise to multiple resources as children of a particular top-level input.
+					# Why "else" condition here at present? Decided a maximum of only one resource per top level input for now (which is admittedly potentially unrealistic for advanced usecases); can be revised later.
 					child_transversal.append(resource["name"])
 					_set_resources(tpl, inputs, resource["children"], child_transversal)
 
@@ -84,7 +86,7 @@ func _on_build_requested(id: int, path: String, args: Dictionary) -> void:
 	# select the first generator in the relevant array. TODO: find a way to select the appropriate one
 	# if we are invoking multiple generators in a single call to Protongraph
 	_set_inputs(tpl, args["generator_payload_data_array"][0])
-	_set_resources(tpl, args["generator_resources_data_array"][0])
+	_set_resources(tpl, args["generator_payload_data_array"][0], args["generator_resources_data_array"][0])
 
 	GlobalEventBus.dispatch("remote_build_started", [id])
 	tpl.generate(true)
