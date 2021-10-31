@@ -376,7 +376,7 @@ func set_remote_input(name: String, value):
 	_remote_inputs[name] = value
 
 # make sure that we record where in the input tree the resource sits
-func set_remote_resource_path(name: String, child_transversal: Array, remote_resource_path: String)
+func set_remote_resource(name: String, child_transversal: Array, remote_resource_path: String)
 	print("in the set_remote_resource function")
 	var remote_resource = {}
 	remote_resource["child_transversal"] = child_transversal

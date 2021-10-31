@@ -54,7 +54,7 @@ func _set_resources(tpl: Template, inputs: Array, resources: Array, child_transv
 				if resource && resource["name"] == input.name && resource["resource_path"]:
 					print(resource)
 					print(input)
-					tpl.set_remote_resource_path(input.name, child_transversal, resource["resource_path"])
+					tpl.set_remote_resource(input.name, child_transversal, resource["resource_path"])
 				else if resource["children"]:
 					child_transversal.append(resource["name"])
 					_set_resources(tpl, inputs, resource["children"], child_transversal)
