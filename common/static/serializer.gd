@@ -41,7 +41,9 @@ func serialize(nodes: Array) -> Dictionary:
 # Inverse of serialize, takes a dictionary and returns a list of Godot nodes.
 func deserialize(data: Dictionary) -> Array:
 	print("in the node_serializer#deserialize function")
+	#print(data)
 	var result: Array = []
+	_resources = []
 	_serialized_resources = data["resources"]
 	# Deserialize resources here?
 
@@ -49,8 +51,11 @@ func deserialize(data: Dictionary) -> Array:
 		print("Deserializing. Node name is:", node.name)
 		print("Deserializing. Node path is:", node.node_path_input)
 		_node_metadata.append(node.node_path_input)
-		result.append(_deserialize_recursive(node))
+		result.append(_deserialize_recursive(node, _resources))
 
+	print("finished deserialising")
+	print(_resources)
+	print(result)
 	return result
 
 
@@ -88,12 +93,16 @@ func _serialize_recursive(node: Node) -> Dictionary:
 
 	return dict
 
-func _deserialize_recursive(data: Dictionary) -> Node:
+func _deserialize_recursive(data: Dictionary, resource_parent: Array) -> Node:
 	var node
+	var resource = {}
+	resource["name"] = data["name"]
+	resource["children"] = []
 	match data["type"]:
 		"node_3d":
 			node = _deserialize_node_3d(data["data"])
 		"mesh":
+			resource["resource_path"] = data["data"]["resource_path"]
 			node = _deserialize_mesh_instance(data["data"])
 		"multi_mesh":
 			node = _deserialize_multi_mesh(data["data"])
@@ -103,19 +112,20 @@ func _deserialize_recursive(data: Dictionary) -> Node:
 			print("Type ", data["type"], " is not supported")
 			return null
 
+	# Important for callback within Godot Client after procedural generation
+	# of scenetree for associated Protongraph template.
+	resource_parent.append(resource)
+
 	if data.has("children"):
 		for serialized_child in data["children"]:
-			var child = _deserialize_recursive(serialized_child)
+			var child = _deserialize_recursive(serialized_child, resource["children"])
 			if child:
 				node.add_child(child)
 
-	print("in node_serializer#_deserialize_recursive")
+	#print("in node_serializer#_deserialize_recursive")
 	if "name" in data:
 		node.name = data["name"]
 
-	# Important for callback within Godot Client after procedural generation
-	# of scenetree for associated Protongraph template.
-	_resources.append(data["node_path_input"])
 	return node
 
 
@@ -173,8 +183,6 @@ func _serialize_node_mesh_instance(mesh_instance: MeshInstance) -> Dictionary:
 
 
 func _deserialize_mesh_instance(data: Dictionary) -> MeshInstance:
-	print("in _deserialize_mesh_instance")
-	#print(data["mesh"])
 	var mi = MeshInstance.new()
 	mi.transform = _deserialize_transform(data)
 

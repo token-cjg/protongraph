@@ -38,6 +38,27 @@ func _set_inputs(tpl: Template, inputs: Array) -> void:
 			print(input)
 			tpl.set_remote_input(input.name, input)
 
+# resources: [{children:[], name:Path}, {children:[{children:[{children:[], name:fence_planks, resource_path:res://assets/fences/models/fence_planks.glb}], name:tmpParent}], name:fence_planks}]
+# inputs: [Path:[Path:3492], fence_planks:[Position3D:3494]]
+func _set_resources(tpl: Template, inputs: Array, resources: Array, child_transversal: Array = []) -> void:
+	print("in the remote_manager#_set_resources function")
+	print(resources)
+	if not inputs:
+		return
+	if not resources:
+		return
+	for input in inputs:
+		if input:
+			print("cycling through resources to see if there is a match")
+			for resource in resources:
+				if resource && resource["name"] == input.name && resource["resource_path"]:
+					print(resource)
+					print(input)
+					tpl.set_remote_resource_path(input.name, child_transversal, resource["resource_path"])
+				else if resource["children"]:
+					child_transversal.append(resource["name"])
+					_set_resources(tpl, inputs, resource["children"], child_transversal)
+
 
 func _on_build_requested(id: int, path: String, args: Dictionary) -> void:
 	print("in the remote_manager#_on_build_requested function")
@@ -62,7 +83,8 @@ func _on_build_requested(id: int, path: String, args: Dictionary) -> void:
 	_set_inspector_values(tpl, args["inspector"])
 	# select the first generator in the relevant array. TODO: find a way to select the appropriate one
 	# if we are invoking multiple generators in a single call to Protongraph
-	_set_inputs(tpl, args["generator_payload_data_array"][0]) 
+	_set_inputs(tpl, args["generator_payload_data_array"][0])
+	_set_resources(tpl, args["generator_resources_data_array"][0])
 
 	GlobalEventBus.dispatch("remote_build_started", [id])
 	tpl.generate(true)
