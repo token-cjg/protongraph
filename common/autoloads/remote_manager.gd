@@ -42,24 +42,29 @@ func _set_inputs(tpl: Template, inputs: Array) -> void:
 # inputs: [Path:[Path:3492], fence_planks:[Position3D:3494]]
 func _set_resources(tpl: Template, inputs: Array, resources: Array, child_transversal: Array = []) -> void:
 	print("in the remote_manager#_set_resources function")
-	print(resources)
+	#print(resources)
 	if not inputs:
 		return
 	if not resources:
 		return
 	for input in inputs:
 		if input:
-			print("cycling through resources to see if there is a match")
+			#print("cycling through resources to see if there is a match")
 			for resource in resources:
+				#print("current resource ...")
+				#print(resource)
 				if resource && resource["name"] == input.name && resource["resource_path"]:
-					print(resource)
-					print(input)
+					#print(resource)
+					#print(input)
+					#print(child_transversal)
 					tpl.set_remote_resource(input.name, child_transversal, resource["resource_path"])
-				else if resource["children"]:
+				else:
 					# TODO: generalise to multiple resources as children of a particular top-level input.
 					# Why "else" condition here at present? Decided a maximum of only one resource per top level input for now (which is admittedly potentially unrealistic for advanced usecases); can be revised later.
-					child_transversal.append(resource["name"])
-					_set_resources(tpl, inputs, resource["children"], child_transversal)
+					#print("recursing")
+					#print(resource["children"])
+					#print("now here ...")
+					_set_resources(tpl, inputs, resource["children"], child_transversal + [resource.name])
 
 
 func _on_build_requested(id: int, path: String, args: Dictionary) -> void:
