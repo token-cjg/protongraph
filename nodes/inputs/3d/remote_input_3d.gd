@@ -21,10 +21,6 @@ func _generate_outputs() -> void:
 	var placeholder = get_input_single(2)
 
 	var input = get_remote_resource(name)
-	print("in _generate_outputs for Remote Input 3D node")
-	# input = [{child_transversal:[fence_planks, tmpParent], remote_resource_path:res://assets/fences/models/fence_planks.glb}]
-	# i.e. fence_planks (Position3D) -> tmpParent (Position3D) -> fence_planks (MeshInstance)
-	# we need to pass all of this information back to the client.
 
 	if not input:
 		input = placeholder
