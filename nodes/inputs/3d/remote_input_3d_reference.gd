@@ -9,7 +9,7 @@ func _init() -> void:
 
 	set_input(0, "Name", DataType.STRING)
 	set_input(1, "Children Only", DataType.BOOLEAN)
-	set_input(2, "Placeholder", DataType.NODE_3D_REFERENCE)
+	set_input(2, "Placeholder", DataType.p_RESOURCE)
 	set_output(0, "", DataType.NODE_3D)
 
 	mirror_slots_type(2, 0)
