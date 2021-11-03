@@ -43,6 +43,6 @@ func _generate_outputs() -> void:
 		path.curve.add_point(end)
 		path.transform = o.transform
 		output[0].push_back(path)
-	print("in _generate_outputs for Create line multi node")
-	print(output[0])
+	#print("in _generate_outputs for Create line multi node")
+	#print(output[0])
 
