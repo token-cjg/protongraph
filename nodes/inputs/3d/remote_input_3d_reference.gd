@@ -10,7 +10,7 @@ func _init() -> void:
 	set_input(0, "Name", DataType.STRING)
 	set_input(1, "Children Only", DataType.BOOLEAN)
 	set_input(2, "Placeholder", DataType.p_RESOURCE)
-	set_output(0, "", DataType.NODE_3D)
+	set_output(0, "", DataType.p_RESOURCE)
 
 	mirror_slots_type(2, 0)
 
@@ -21,7 +21,6 @@ func _generate_outputs() -> void:
 	var placeholder = get_input_single(2)
 
 	var input = get_remote_resource(name)
-	print("in _generate_outputs for Remote Input 3D by reference node")
 	# input = [{child_transversal:[fence_planks, tmpParent], remote_resource_path:res://assets/fences/models/fence_planks.glb}]
 	# i.e. fence_planks (Position3D) -> tmpParent (Position3D) -> fence_planks (MeshInstance)
 	# we need to pass all of this information back to the client.

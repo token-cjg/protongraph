@@ -28,20 +28,20 @@ func _set_inspector_values(tpl: Template, values: Array) -> void:
 
 
 func _set_inputs(tpl: Template, inputs: Array) -> void:
-	print("in the remote_manager#_set_inputs function")
-	print(inputs)
+	#print("in the remote_manager#_set_inputs function")
+	#print(inputs)
 	if not inputs:
 		return
 	for input in inputs:
 		if input:
-			print("processing an input")
-			print(input)
+			#print("processing an input")
+			#print(input)
 			tpl.set_remote_input(input.name, input)
 
 # resources: [{children:[], name:Path}, {children:[{children:[{children:[], name:fence_planks, resource_path:res://assets/fences/models/fence_planks.glb}], name:tmpParent}], name:fence_planks}]
 # inputs: [Path:[Path:3492], fence_planks:[Position3D:3494]]
 func _set_resources(tpl: Template, inputs: Array, resources: Array, child_transversal: Array = []) -> void:
-	print("in the remote_manager#_set_resources function")
+	#print("in the remote_manager#_set_resources function")
 	#print(resources)
 	if not inputs:
 		return

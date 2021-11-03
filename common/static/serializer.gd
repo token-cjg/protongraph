@@ -40,7 +40,7 @@ func serialize(nodes: Array) -> Dictionary:
 
 # Inverse of serialize, takes a dictionary and returns a list of Godot nodes.
 func deserialize(data: Dictionary) -> Array:
-	print("in the node_serializer#deserialize function")
+	#print("in the node_serializer#deserialize function")
 	#print(data)
 	var result: Array = []
 	_resources = []
@@ -48,14 +48,14 @@ func deserialize(data: Dictionary) -> Array:
 	# Deserialize resources here?
 
 	for node in data["node"]:
-		print("Deserializing. Node name is:", node.name)
-		print("Deserializing. Node path is:", node.node_path_input)
+		#print("Deserializing. Node name is:", node.name)
+		#print("Deserializing. Node path is:", node.node_path_input)
 		_node_metadata.append(node.node_path_input)
 		result.append(_deserialize_recursive(node, _resources))
 
-	print("finished deserialising")
-	print(_resources)
-	print(result)
+	#print("finished deserialising")
+	#print(_resources)
+	#print(result)
 	return result
 
 

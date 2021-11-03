@@ -32,7 +32,7 @@ func _on_data_received(id: int , data: Dictionary) -> void:
 
 
 func _on_remote_build_requested(id, msg: Dictionary) -> void:
-	print("in _on_remote_build_requested")
+	#print("in _on_remote_build_requested")
 	#print(msg["inputs"])
 	if not msg.has("path"):
 		return
@@ -43,7 +43,7 @@ func _on_remote_build_requested(id, msg: Dictionary) -> void:
 	var generator_resources_data_array := []
 	if msg.has("inputs"): # actually the generator payload of form [{ "node": [{inputs}], "resources": {}}]
 		for generator_payload_data in msg["inputs"]: # of form { "node": [{inputs}], "resources": {}}
-			print("in _on_remote_build_requested")
+			#print("in _on_remote_build_requested")
 			generator_payload_data_array.append(_node_serializer.deserialize(generator_payload_data))
 	generator_resources_data_array.append(_node_serializer._resources)
 	var args := {
