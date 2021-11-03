@@ -57,7 +57,7 @@ func _set_resources(tpl: Template, inputs: Array, resources: Array, child_transv
 					#print(resource)
 					#print(input)
 					#print(child_transversal)
-					tpl.set_remote_resource(input.name, child_transversal, resource["resource_path"])
+					tpl.set_remote_resource(input.name, child_transversal + [resource.name], resource["resource_path"])
 				else:
 					# TODO: generalise to multiple resources as children of a particular top-level input.
 					# Why "else" condition here at present? Decided a maximum of only one resource per top level input for now (which is admittedly potentially unrealistic for advanced usecases); can be revised later.
