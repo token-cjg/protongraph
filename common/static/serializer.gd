@@ -48,7 +48,7 @@ func serialize(nodes_with_references: Array) -> Dictionary:
 	for node in nodes_with_references[0]["nodes"]:
 		result["nodes"].push_back(_serialize_recursive(node))
 	
-	result["resource_references"].push_back(nodes_with_references[0]["resource_references"])
+	result["resource_references"].push_back(nodes_with_references[0]["resource_references"][0])
 	return result
 
 
