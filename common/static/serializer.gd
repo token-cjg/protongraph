@@ -26,8 +26,13 @@ var _serialized_node_metadata: Dictionary
 # and serializes it into a dictionary.
 #
 # ## Example data:
-# [{nodes:[fence_planks:[Position3D:5697], fence_planks:[Position3D:5701], fence_planks:[Position3D:5705]], resources:[{child_transversal:[fence_planks, tmpParent, fence_planks], remote_resource_path:res://assets/fences/models/fence_planks.glb}]
+# [{nodes:[fence_planks:[Position3D:5697], fence_planks:[Position3D:5701], fence_planks:[Position3D:5705]], resource_references:[{child_transversal:[fence_planks, tmpParent, fence_planks], remote_resource_path:res://assets/fences/models/fence_planks.glb}]
 # ## Example output:
+# {
+#	"resources": []
+#	"nodes": [fence_planks:[Position3D:5697], fence_planks:[Position3D:5701], fence_planks:[Position3D:5705]]
+#   "resource_references": [{child_transversal:[fence_planks, tmpParent, fence_planks], remote_resource_path:res://assets/fences/models/fence_planks.glb}]
+# }
 func serialize(nodes_with_references: Array) -> Dictionary:
 	print("in the serialize function")
 	print(nodes_with_references)
@@ -36,13 +41,14 @@ func serialize(nodes_with_references: Array) -> Dictionary:
 
 	var result: Dictionary = {
 		"resources": [],
+		"resource_references": [],
 		"nodes": []
 	}
 
 	for node in nodes_with_references[0]["nodes"]:
 		result["nodes"].push_back(_serialize_recursive(node))
 	
-	result["resources"].push_back(nodes_with_references[0]["resources"])
+	result["resource_references"].push_back(nodes_with_references[0]["resource_references"])
 	return result
 
 

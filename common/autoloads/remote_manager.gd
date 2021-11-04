@@ -38,33 +38,33 @@ func _set_inputs(tpl: Template, inputs: Array) -> void:
 			#print(input)
 			tpl.set_remote_input(input.name, input)
 
-# resources: [{children:[], name:Path}, {children:[{children:[{children:[], name:fence_planks, resource_path:res://assets/fences/models/fence_planks.glb}], name:tmpParent}], name:fence_planks}]
+# resource_references: [{children:[], name:Path}, {children:[{children:[{children:[], name:fence_planks, resource_path:res://assets/fences/models/fence_planks.glb}], name:tmpParent}], name:fence_planks}]
 # inputs: [Path:[Path:3492], fence_planks:[Position3D:3494]]
-func _set_resources(tpl: Template, inputs: Array, resources: Array, child_transversal: Array = []) -> void:
+func _set_resource_references(tpl: Template, inputs: Array, resource_references: Array, child_transversal: Array = []) -> void:
 	#print("in the remote_manager#_set_resources function")
-	#print(resources)
+	#print(resource_references)
 	if not inputs:
 		return
-	if not resources:
+	if not resource_references:
 		return
 	for input in inputs:
 		if input:
 			#print("cycling through resources to see if there is a match")
-			for resource in resources:
-				#print("current resource ...")
-				#print(resource)
-				if resource && resource["name"] == input.name && resource["resource_path"]:
+			for resource_reference in resource_references:
+				#print("current resource_reference ...")
+				#print(resource_reference)
+				if resource_reference && resource_reference["name"] == input.name && resource_reference["resource_path"]:
 					#print(resource)
 					#print(input)
 					#print(child_transversal)
-					tpl.set_remote_resource(input.name, child_transversal + [resource.name], resource["resource_path"])
+					tpl.set_remote_resource(input.name, child_transversal + [resource_reference.name], resource_reference["resource_path"])
 				else:
-					# TODO: generalise to multiple resources as children of a particular top-level input.
-					# Why "else" condition here at present? Decided a maximum of only one resource per top level input for now (which is admittedly potentially unrealistic for advanced usecases); can be revised later.
+					# TODO: generalise to multiple resource_references as children of a particular top-level input.
+					# Why "else" condition here at present? Decided a maximum of only one resource_reference per top level input for now (which is admittedly potentially unrealistic for advanced usecases); can be revised later.
 					#print("recursing")
-					#print(resource["children"])
+					#print(resource_reference["children"])
 					#print("now here ...")
-					_set_resources(tpl, inputs, resource["children"], child_transversal + [resource.name])
+					_set_resource_references(tpl, inputs, resource_reference["children"], child_transversal + [resource_reference.name])
 
 
 func _on_build_requested(id: int, path: String, args: Dictionary) -> void:
@@ -91,7 +91,7 @@ func _on_build_requested(id: int, path: String, args: Dictionary) -> void:
 	# select the first generator in the relevant array. TODO: find a way to select the appropriate one
 	# if we are invoking multiple generators in a single call to Protongraph
 	_set_inputs(tpl, args["generator_payload_data_array"][0])
-	_set_resources(tpl, args["generator_payload_data_array"][0], args["generator_resources_data_array"][0])
+	_set_resource_references(tpl, args["generator_payload_data_array"][0], args["generator_resources_data_array"][0])
 
 	GlobalEventBus.dispatch("remote_build_started", [id])
 	tpl.generate(true)
