@@ -14,9 +14,9 @@ func _init() -> void:
 
 func _generate_outputs() -> void:
 	#print("in the remote_sync _generate_outputs function")
-	#print("resources %s" % str(get_input(0)))
+	#print("resource_references %s" % str(get_input(0)))
 	#print("nodes %s" % str(get(input(1))))
-	output[0] = { "resources": get_input(0), "nodes": get_input(1) }
+	output[0] = { "resource_references": get_input(0), "nodes": get_input(1) }
 	#print(output[0])
 
 

@@ -20,21 +20,35 @@ var _serialized_node_metadata: Dictionary
 
 # -- Public API --
 
-# Takes a list of nodes and serialize them all in a dictionary.
-func serialize(nodes: Array) -> Dictionary:
+# Takes data of the form
+#[{nodes:[list_of_nodes], resources:[list_of_resource_references]}]
+# where a resource_reference is of the form {child_transversal:[node_traversal_sequence], remote_resource_path:path_to_resource_in_client}
+# and serializes it into a dictionary.
+#
+# ## Example data:
+# [{nodes:[fence_planks:[Position3D:5697], fence_planks:[Position3D:5701], fence_planks:[Position3D:5705]], resource_references:[{child_transversal:[fence_planks, tmpParent, fence_planks], remote_resource_path:res://assets/fences/models/fence_planks.glb}]
+# ## Example output:
+# {
+#	"resources": []
+#	"nodes": [fence_planks:[Position3D:5697], fence_planks:[Position3D:5701], fence_planks:[Position3D:5705]]
+#   "resource_references": [{child_transversal:[fence_planks, tmpParent, fence_planks], remote_resource_path:res://assets/fences/models/fence_planks.glb}]
+# }
+func serialize(nodes_with_references: Array) -> Dictionary:
 	print("in the serialize function")
+	print(nodes_with_references)
 	var _resources = []
 	var _serialized_resources = {}
 
 	var result: Dictionary = {
-		"resources": {},
+		"resources": [],
+		"resource_references": [],
 		"nodes": []
 	}
 
-	for node in nodes:
+	for node in nodes_with_references[0]["nodes"]:
 		result["nodes"].push_back(_serialize_recursive(node))
-
-	result["resources"] = _serialized_resources
+	
+	result["resource_references"].push_back(nodes_with_references[0]["resource_references"][0])
 	return result
 
 
