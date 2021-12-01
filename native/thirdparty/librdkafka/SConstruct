@@ -71,10 +71,12 @@ if env['platform'] == "osx":
     env['target_name'] += '.dylib'
     cpp_library += '.osx'
     if env['target'] in ('debug', 'd'):
-        env.Append(CCFLAGS=['-g', '-O2', '-arch', 'x86_64', '-std=c++17'])
+        env.Append(CCFLAGS=['-g', '-O2', '-arch', 'x86_64'])
+        env.Append(CXXFLAGS=['-std=c++17'])
         env.Append(LINKFLAGS=['-arch', 'x86_64'])
     else:
-        env.Append(CCFLAGS=['-g', '-O3', '-arch', 'x86_64', '-std=c++17'])
+        env.Append(CCFLAGS=['-g', '-O3', '-arch', 'x86_64'])
+        env.Append(CXXFLAGS=['-std=c++17'])
         env.Append(LINKFLAGS=['-arch', 'x86_64'])
 
 elif env['platform'] in ('x11', 'linux'):
@@ -143,6 +145,7 @@ env.Append(LIBS=[cpp_library])
 env.Append(CPPPATH=['./'])
 sources = Glob('gdnative/*.cpp')
 sources += Glob('lib/src-cpp/*.cpp')
+sources += Glob('lib/src/*.c')
 
 library = env.SharedLibrary(target=env['target_path'] + env['target_name'] , source=sources)
 

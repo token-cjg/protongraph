@@ -17,6 +17,7 @@ class LibRdKafka : public Reference {
     GODOT_CLASS(LibRdKafka, Reference);
 
 public:
+    // void _rd_kafka_abort_transaction();
     static void _register_methods();
      LibRdKafka();
     ~LibRdKafka();
