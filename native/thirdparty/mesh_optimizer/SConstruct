@@ -143,8 +143,6 @@ env.Append(LIBS=[cpp_library])
 env.Append(CPPPATH=['./'])
 sources = Glob('gdnative/*.cpp')
 sources += Glob('lib/meshoptimizer/src/*.cpp')
-sources += Glob('lib/librdkafka/src-cpp/*.cpp')
-sources += Glob('lib/cppkafka/src/*.cpp')
 
 library = env.SharedLibrary(target=env['target_path'] + env['target_name'] , source=sources)
 
