@@ -72,22 +72,16 @@ if env['platform'] == '':
 if env['platform'] == "osx":
     env['target_path'] += 'osx/'
     env['target_name'] += '.dylib'
+    env.Append(CXXFLAGS=['-std=c++17', '-Wno-non-virtual-dtor'])
+    env.Append(CFLAGS=['-I/usr/local/Cellar/zlib/1.2.11/include', '-I/usr/local/Cellar/openssl@3/3.0.0_1/include', '-I/usr/local/Cellar/openssl@3/3.0.0_1/include', '-I/usr/local/Cellar/zstd/1.5.0/include', '-I/usr/local/Cellar/lz4/1.9.3/include'])
+    env.Append(CPPFLAGS=['-I/usr/local/Cellar/zlib/1.2.11/include', '-I/usr/local/Cellar/openssl@3/3.0.0_1/include', '-I/usr/local/Cellar/openssl@3/3.0.0_1/include', '-I/usr/local/Cellar/zstd/1.5.0/include', '-I/usr/local/Cellar/lz4/1.9.3/include'])
+    env.Append(LDFLAGS=['-L/usr/local/Cellar/lz4/1.9.3/lib', '-llz4', '-lm', '-lcurl', '-L/usr/local/Cellar/zstd/1.5.0/lib', '-lzstd', '-lsasl2', '-L/usr/local/Cellar/openssl@3/3.0.0_1/lib', '-lssl', '-L/usr/local/Cellar/openssl@3/3.0.0_1/lib', '-lcrypto', '-L/usr/local/Cellar/zlib/1.2.11/lib', '-lz', '-ldl', '-lpthread'])
+    env.Append(LINKFLAGS=['-arch', 'x86_64'])
     cpp_library += '.osx'
     if env['target'] in ('debug', 'd'):
         env.Append(CCFLAGS=['-g', '-O2', '-arch', 'x86_64'])
-        env.Append(CXXFLAGS=['-std=c++17'])
-        env.Append(CFLAGS=['-I/usr/local/opt/openssl@' + str(openssl_version) + '/include'])
-        env.Append(CPPFLAGS=['-I/usr/local/opt/openssl@' + str(openssl_version) + '/include'])
-        env.Append(LDFLAGS=['-L/usr/local/opt/openssl@' + str(openssl_version) + '/lib', '-lcrypto', '-lssl'])
-        env.Append(LINKFLAGS=['-arch', 'x86_64'])
     else:
         env.Append(CCFLAGS=['-g', '-O3', '-arch', 'x86_64'])
-        env.Append(CXXFLAGS=['-std=c++17'])
-        env.Append(CFLAGS=['-I/usr/local/opt/openssl@' + str(openssl_version) + '/include'])
-        env.Append(CPPFLAGS=['-I/usr/local/opt/openssl@' + str(openssl_version) + '/include'])
-        env.Append(LDFLAGS=['-L/usr/local/opt/openssl@' + str(openssl_version) + '/lib', '-lcrypto', '-lssl'])
-        env.Append(LINKFLAGS=['-arch', 'x86_64'])
-
 elif env['platform'] in ('x11', 'linux'):
     env['target_path'] += 'x11/'
     env['target_name'] += '.so'
