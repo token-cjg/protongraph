@@ -74,13 +74,13 @@ if env['platform'] == "osx":
         env.Append(CCFLAGS=['-g', '-O2', '-arch', 'x86_64'])
         env.Append(CXXFLAGS=['-std=c++17'])
         env.Append(CPPFLAGS=['-I/usr/local/opt/openssl/include'])
-        env.Append(LDFLAGS=['-L/usr/local/opt/openssl/lib'])
+        env.Append(LDFLAGS=['-L/usr/local/opt/openssl/lib', '-lcrypto'])
         env.Append(LINKFLAGS=['-arch', 'x86_64'])
     else:
         env.Append(CCFLAGS=['-g', '-O3', '-arch', 'x86_64'])
         env.Append(CXXFLAGS=['-std=c++17'])
         env.Append(CPPFLAGS=['-I/usr/local/opt/openssl/include'])
-        env.Append(LDFLAGS=['-L/usr/local/opt/openssl/lib'])
+        env.Append(LDFLAGS=['-L/usr/local/opt/openssl/lib', '-lcrypto'])
         env.Append(LINKFLAGS=['-arch', 'x86_64'])
 
 elif env['platform'] in ('x11', 'linux'):
@@ -149,7 +149,8 @@ env.Append(LIBS=[cpp_library])
 env.Append(CPPPATH=['./'])
 sources = Glob('gdnative/*.cpp')
 sources += Glob('lib/src-cpp/*.cpp')
-sources += Glob('lib/src/*.c')
+excluded_c_files = ['lib/src/rdkafka_sasl_win32.c']
+sources += [x for x in Glob('lib/src/*.c') if str(x) not in excluded_c_files]
 
 library = env.SharedLibrary(target=env['target_path'] + env['target_name'] , source=sources)
 
