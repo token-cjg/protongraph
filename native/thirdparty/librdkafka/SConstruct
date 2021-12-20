@@ -74,9 +74,9 @@ if env['platform'] == "osx":
     env['target_name'] += '.dylib'
     env.Append(CXXFLAGS=['-std=c++17', '-Wno-non-virtual-dtor'])
     env.Append(CFLAGS=['-I/usr/local/Cellar/zlib/1.2.11/include', '-I/usr/local/Cellar/openssl@3/3.0.0_1/include', '-I/usr/local/Cellar/openssl@3/3.0.0_1/include', '-I/usr/local/Cellar/zstd/1.5.0/include', '-I/usr/local/Cellar/lz4/1.9.3/include'])
-    env.Append(CPPFLAGS=['-I/usr/local/Cellar/zlib/1.2.11/include', '-I/usr/local/Cellar/openssl@3/3.0.0_1/include', '-I/usr/local/Cellar/openssl@3/3.0.0_1/include', '-I/usr/local/Cellar/zstd/1.5.0/include', '-I/usr/local/Cellar/lz4/1.9.3/include'])
+    env.Append(CPPFLAGS=['-gstrict-dwarf', '-O2', '-fPIC', '-Wall', '-Wsign-compare', '-Wfloat-equal', '-Wpointer-arith', '-Wcast-align'])
     env.Append(LDFLAGS=['-L/usr/local/Cellar/lz4/1.9.3/lib', '-llz4', '-lm', '-lcurl', '-L/usr/local/Cellar/zstd/1.5.0/lib', '-lzstd', '-lsasl2', '-L/usr/local/Cellar/openssl@3/3.0.0_1/lib', '-lssl', '-L/usr/local/Cellar/openssl@3/3.0.0_1/lib', '-lcrypto', '-L/usr/local/Cellar/zlib/1.2.11/lib', '-lz', '-ldl', '-lpthread'])
-    env.Append(LINKFLAGS=['-arch', 'x86_64'])
+    env.Append(LINKFLAGS=['-arch', 'x86_64', '-shared', '-dynamiclib', '-Wl'])
     cpp_library += '.osx'
     if env['target'] in ('debug', 'd'):
         env.Append(CCFLAGS=['-g', '-O2', '-arch', 'x86_64'])
@@ -151,9 +151,16 @@ sources += Glob('lib/src-cpp/*.cpp')
 excluded_c_files = ['lib/src/rdkafka_sasl_win32.c']
 sources += [x for x in Glob('lib/src/*.c') if str(x) not in excluded_c_files]
 
-library = env.SharedLibrary(target=env['target_path'] + env['target_name'] , source=sources)
+# comment this out & generate artifacts instead per line below
+# library = env.SharedLibrary(target=env['target_path'] + env['target_name'] , source=sources)
 
-Default(library)
+artifacts = env.Make(target=env['target_path'] + env['target_name'], source=sources,
+     MakeTargets="clean all",                 
+     MakePath=Dir('./lib'), MakeOpts=[], MakeEnv=call_vars)
+env.AlwaysBuild(artifacts)
+
+
+Default(artifacts)
 
 # Generates help for the -h scons option.
 Help(opts.GenerateHelpText(env))
