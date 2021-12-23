@@ -19,6 +19,10 @@ class LibRdKafka : public Reference {
 public:
     // void _rd_kafka_abort_transaction();
     static void _register_methods();
+    void init_consumer();
+    void init_producer();
+    void consume_message();
+    void produce_message();
      LibRdKafka();
     ~LibRdKafka();
 };
