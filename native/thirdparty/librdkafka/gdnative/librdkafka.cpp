@@ -12,7 +12,7 @@ void LibRdKafka::_register_methods() {
   // register_method("optimize_mesh_instance", &MeshOptimizer::optimize_mesh_instance);
   // register_method("simplify", &MeshOptimizer::simplify);
   register_method("consume_message", &LibRdKafka::consume_message);
-  register_method("produce_message", &LibRdKafka::produce_message);
+  register_method("produce", &LibRdKafka::produce);
   register_method("init_consumer", &LibRdKafka::init_consumer);
   register_method("init_producer", &LibRdKafka::init_producer);
 
@@ -92,7 +92,7 @@ dr_msg_cb(rd_kafka_t *rk, const rd_kafka_message_t *rkmessage, void *opaque) {
 
 
 // Writes a message to the Kafka topic using rd_kafka_producev (the new version of rd_kafka_produce, see https://github.com/edenhill/librdkafka/issues/2732#issuecomment-591312809).
-int LibRdKafka::produce_message(int argc, char **argv, rd_kafka_conf_t *conf, const char *topic, rd_kafka_message_t *message) {
+int LibRdKafka::produce(int argc, char **argv, rd_kafka_conf_t *conf, const char *topic, rd_kafka_message_t *message) {
   rd_kafka_t *rk;        /* Producer instance handle */
   char errstr[512];      /* librdkafka API error reporting buffer */
   char buf[512];         /* Message value temporary buffer */

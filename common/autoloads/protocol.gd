@@ -3,6 +3,10 @@ extends Node
 
 var _server: IPCServer
 var _node_serializer: NodeSerializer
+var librdkafka
+
+func _init():
+	librdkafka = load("res://native/thirdparty/librdkafka/librdkafka.gdns").new()
 
 
 func _ready():
@@ -54,4 +58,8 @@ func _on_remote_build_requested(id, msg: Dictionary) -> void:
 func _on_remote_build_completed(id, data: Array) -> void:
 	var msg = {"type": "build_completed"}
 	msg["data"] = _node_serializer.serialize(data)
+	# TODO: based on whether Protongraph is operating in Kafka mode or not,
+	# either respond to the request via the WebSocket / IPC Server connection or
+	# produce a message on the configured Kafka topic.
+	librdkafka.produce(msg)
 	_server.send(id, msg)
