@@ -1,3 +1,8 @@
+# mklove
+Makefile.config
+config.log*
+config.cache
+config.h
 
 # Godot-specific ignores
 .import/
