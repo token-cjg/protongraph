@@ -1,3 +1,7 @@
+# kafka config
+config/kafka.config
+config/secrets/*.*
+
 # mklove
 Makefile.config
 config.log*
