@@ -42,7 +42,7 @@ on how to actually use the software, tutorials and example files.
 
 If you want to build the project from source yourself, first read the instructions on this repository: https://github.com/proton-graph/environment.  Note: Originally Protongraph required a custom build of the Godot game engine, but this is no longer required as of Godot 3.4.x.  You will still need to build the engine from source though if you want to compile from command line, see [here](https://docs.godotengine.org/en/stable/development/compiling/index.html) for a guide on how to do this.
 
-(Note that as of writing Protongraph supports building for Godot 3.4.2, and work to migratee Protongraph to Godot 4 is currently in progress.)
+(Note that as of writing Protongraph supports building for Godot 3.4.2, and work to migrate Protongraph to Godot 4 is currently in progress.)
 
 Once you have a built Godot binary you'll want to move it to the root of the Protongraph directory.  Currently the project Makefile assumes that this binary will be labelled `godot.3.4.2`.  Note that `make` will not work unless you have this binary available.
 
