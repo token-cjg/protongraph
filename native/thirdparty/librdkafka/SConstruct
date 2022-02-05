@@ -66,7 +66,7 @@ opts.Add(EnumVariable('platform', "Compilation platform", '', ['', 'windows', 'x
 opts.Add(EnumVariable('p', "Compilation target, alias for 'platform'", '', ['', 'windows', 'x11', 'linux', 'osx']))
 opts.Add(BoolVariable('use_llvm', "Use the LLVM / Clang compiler", 'no'))
 opts.Add(PathVariable('target_path', 'The path where the lib is installed.', 'bin/'))
-opts.Add(PathVariable('target_name', 'The library name.', 'libmeshoptimizer', PathVariable.PathAccept))
+opts.Add(PathVariable('target_name', 'The library name.', 'librdkafka', PathVariable.PathAccept))
 
 # Local dependency paths, adapt them to your setup
 godot_headers_path = "../../godot-cpp/godot_headers/"
@@ -185,11 +185,21 @@ sources += Glob('lib/src-cpp/*.cpp')
 excluded_c_files = ['lib/src/rdkafka_sasl_win32.c']
 sources += [x for x in Glob('lib/src/*.c') if str(x) not in excluded_c_files]
 
-#library = env.SharedLibrary(target=env['target_path'] + env['target_name'], source=sources)
-#Default(library)
+def build_rdkafka(source, target, env):
+    env.Command(target=target, source=source, action=Action(Make, strfunction = log_output_fn))
+    os.system('cp lib/src-cpp/librdkafka++.dylib bin/osx/librdkafka.dylib')
 
-my_prog = env.Command(target=env['target_path'] + env['target_name'], source=sources, action=Action(Make, strfunction = log_output_fn))
-Default(my_prog)
+build_rdkafka_builder = Builder(
+    action=build_rdkafka)
+
+env.Append( BUILDERS = {'rdkafka_builder' : build_rdkafka_builder } )
+
+my_cmd = env.rdkafka_builder(target=env['target_path'] + env['target_name'], source=sources)
+Default(my_cmd)
+
+
+#my_prog = env.Command(target=env['target_path'] + env['target_name'], source=sources, action=Action(Make, strfunction = log_output_fn))
+#Default(my_prog)
 
 # Generates help for the -h scons option.
 Help(opts.GenerateHelpText(env))
