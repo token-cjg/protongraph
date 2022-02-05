@@ -44,7 +44,7 @@ If you want to build the project from source yourself, first read the instructio
 
 (Note that as of writing Protongraph supports building for Godot 3.4.2, and work to migrate Protongraph to Godot 4 is currently in progress.)
 
-Once you have a built Godot binary you'll want to move it to the root of the Protongraph directory.  Currently the project Makefile assumes that this binary will be labelled `godot.3.4.2`.  Note that `make` will not work unless you have this binary available.
+Once you have a built Godot binary you'll want to move it to the root of the Protongraph directory.  Currently the project Makefile assumes that this binary will be labelled `godot.osx.3.4.2-stable.tools.64`.  Note that `make` will not work unless you have this binary available.
 
 You'll also want the export templates for 3.4.2 as well, you can find them [here](https://downloads.tuxfamily.org/godotengine/3.4.2/).  These templates should be placed in the build folder.
 
