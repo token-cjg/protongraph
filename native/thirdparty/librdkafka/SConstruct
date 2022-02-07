@@ -187,7 +187,9 @@ sources += [x for x in Glob('lib/src/*.c') if str(x) not in excluded_c_files]
 
 def build_rdkafka(source, target, env):
     env.Command(target=target, source=source, action=Action(Make, strfunction = log_output_fn))
-    os.system('cp lib/src-cpp/librdkafka++.dylib bin/osx/librdkafka.dylib')
+    os.system('cp lib/src/librdkafka.dylib bin/osx/librdkafka.dylib')
+    os.system('cp lib/src/librdkafka.1.dylib bin/osx/librdkafka.1.dylib')
+    os.system('install_name_tool -change /usr/local/lib/librdkafka.1.dylib @executable_path/librdkafka.1.dylib bin/osx/librdkafka.dylib')
 
 build_rdkafka_builder = Builder(
     action=build_rdkafka)
