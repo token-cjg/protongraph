@@ -6,8 +6,8 @@ var _node_serializer: NodeSerializer
 var librdkafka
 
 func _init():
+	librdkafka = load("res://native/thirdparty/librdkafka/librdkafka.gdns")
 	pass
-	# librdkafka = load("res://native/thirdparty/librdkafka/librdkafka.gdns").new()
 
 
 func _ready():
