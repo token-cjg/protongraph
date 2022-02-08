@@ -146,20 +146,6 @@ env.Append(CPPPATH=['./'])
 sources = Glob('gdnative/*.cpp')
 sources += Glob('lib/src-cpp/*.cpp')
 
-# def build_rdkafka(target, source, env):
-#     print('Building rdkafka...')
-#     env.SharedLibrary(target=env['target_path'] + env['target_name'] , source=sources)
-#     print('Done building rdkafka.')
-#     print('Now altering the librdkafka.1.dylib dependency to be relative to executable path.')
-#     subprocess.call(('cp lib/src/librdkafka.1.dylib bin/osx/librdkafka.1.dylib'), shell=True)
-#     subprocess.call(('install_name_tool -change /usr/local/lib/librdkafka.1.dylib @executable_path/librdkafka.1.dylib bin/osx/librdkafka.dylib'), shell=True)
-#     print('Done altering the executable using the install_name_tool.')
-
-# build_rdkafka_builder = Builder(action=build_rdkafka)
-# env.Append( BUILDERS = {'rdkafka_builder' : build_rdkafka_builder } )
-# my_cmd = env.rdkafka_builder(target=env['target_path'] + env['target_name'], source=sources)
-# Default(my_cmd)
-
 library = env.SharedLibrary(target=env['target_path'] + env['target_name'], source=sources)
 Default(library)
 
