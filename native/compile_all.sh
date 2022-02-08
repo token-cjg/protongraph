@@ -31,3 +31,5 @@ fi
 # Add kafka client support so that we can consume and produce to kafka topics on a (secured) kafka cluster or vm.
 cd thirdparty/librdkafka
 scons -j${threads} platform=$platform bits=64 debug_symbols=no target=$target
+cp lib/src/librdkafka.1.dylib bin/osx/librdkafka.1.dylib
+install_name_tool -change /usr/local/lib/librdkafka.1.dylib @executable_path/native/thirdparty/librdkafka/bin/osx/librdkafka.1.dylib bin/osx/librdkafka.dylib
