@@ -67,6 +67,7 @@ opts.Add(EnumVariable('p', "Compilation target, alias for 'platform'", '', ['', 
 opts.Add(BoolVariable('use_llvm', "Use the LLVM / Clang compiler", 'no'))
 opts.Add(PathVariable('target_path', 'The path where the lib is installed.', 'bin/'))
 opts.Add(PathVariable('target_name', 'The library name.', 'librdkafka', PathVariable.PathAccept))
+opts.Add(PathVariable('temp_target_name', 'The intermediate build name.', 'librdkafkatemp', PathVariable.PathAccept))
 
 # Local dependency paths, adapt them to your setup
 godot_headers_path = "../../godot-cpp/godot_headers/"
@@ -185,20 +186,27 @@ sources += Glob('lib/src-cpp/*.cpp')
 excluded_c_files = ['lib/src/rdkafka_sasl_win32.c']
 sources += [x for x in Glob('lib/src/*.c') if str(x) not in excluded_c_files]
 
-def build_rdkafka(source, target, env):
+def build_rdkafka(target, source, env):
+    print('Building rdkafka...')
     env.Command(target=target, source=source, action=Action(Make, strfunction = log_output_fn))
-    os.system('cp lib/src/librdkafka.dylib bin/osx/librdkafka.dylib')
-    os.system('cp lib/src/librdkafka.1.dylib bin/osx/librdkafka.1.dylib')
-    os.system('install_name_tool -change /usr/local/lib/librdkafka.1.dylib @executable_path/librdkafka.1.dylib bin/osx/librdkafka.dylib')
+    print('Done building rdkafka.')
+    subprocess.call(('cp lib/src/librdkafka.dylib bin/osx/librdkafka.dylib'), shell=True)
+    subprocess.call(('cp lib/src/librdkafka.1.dylib bin/osx/librdkafka.1.dylib'), shell=True)
+    subprocess.call(('install_name_tool -change /usr/local/lib/librdkafka.1.dylib @executable_path/librdkafka.1.dylib bin/osx/librdkafka.dylib'), shell=True)
 
-build_rdkafka_builder = Builder(
-    action=build_rdkafka)
+    # os.system('cp lib/src/librdkafka.dylib bin/osx/librdkafka.dylib')
+    # os.system('cp lib/src/librdkafka.1.dylib bin/osx/librdkafka.1.dylib')
+    # os.system('install_name_tool -change /usr/local/lib/librdkafka.1.dylib @executable_path/librdkafka.1.dylib bin/osx/librdkafka.dylib')
+    # shared_library = env.SharedLibrary(target=target, source=source)
+    # return shared_library
+
+
+build_rdkafka_builder = Builder(action=build_rdkafka)
 
 env.Append( BUILDERS = {'rdkafka_builder' : build_rdkafka_builder } )
 
 my_cmd = env.rdkafka_builder(target=env['target_path'] + env['target_name'], source=sources)
 Default(my_cmd)
-
 
 #my_prog = env.Command(target=env['target_path'] + env['target_name'], source=sources, action=Action(Make, strfunction = log_output_fn))
 #Default(my_prog)
