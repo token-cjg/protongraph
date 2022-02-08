@@ -6,7 +6,8 @@ var _node_serializer: NodeSerializer
 var librdkafka
 
 func _init():
-	librdkafka = load("res://native/thirdparty/librdkafka/librdkafka.gdns").new()
+	pass
+	# librdkafka = load("res://native/thirdparty/librdkafka/librdkafka.gdns").new()
 
 
 func _ready():
@@ -61,5 +62,6 @@ func _on_remote_build_completed(id, data: Array) -> void:
 	# TODO: based on whether Protongraph is operating in Kafka mode or not,
 	# either respond to the request via the WebSocket / IPC Server connection or
 	# produce a message on the configured Kafka topic.
-	librdkafka.produce(msg)
+	# TODO: implement produce again
+	# librdkafka.produce(msg)
 	_server.send(id, msg)
