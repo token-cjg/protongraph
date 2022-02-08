@@ -1,39 +1,5 @@
 #!python
 import os, subprocess, sys
-import SCons.Script
-
-def run(cmd):
-    """Run a command and decipher the return code. Exit by default."""
-    res = os.system(cmd)
-    # Assumes that if a process doesn't call exit, it was successful
-    if (os.WIFEXITED(res)):
-        code = os.WEXITSTATUS(res)
-        if code != 0:
-            print("Error: return code: " + str(code))
-            if SCons.Script.keep_going_on_error == 0:
-                sys.exit(code)
-
-import time
-def Make(target, source, env):
-    """Run configure as necessary and then run make"""
-    baseDir = Dir("#.").abspath
-    # BUILD_DIR is the top build directory relative to SConstruct
-    buildDir = baseDir + '/' + 'lib'
-
-    startdir = os.getcwd()   # restore cwd at the end
-    os.chdir(buildDir)
-    # Always run make
-    print('... running make: ' + time.asctime(time.localtime(time.time())))
-    run('make')
-    print('... make finished: ' + time.asctime(time.localtime(time.time())))
-    os.chdir(startdir)    # restore the original cwd
-
-    return 0
-
-def log_output_fn(target, source, env):
-    """The message seen in build logs when this action is called"""
-    return "Building '%s'\n from '%s'\n at: %s" % (target[0], source[0], 
-      time.asctime(time.localtime(time.time())))
 
 opts = Variables([], ARGUMENTS)
 
@@ -66,19 +32,17 @@ opts.Add(EnumVariable('platform', "Compilation platform", '', ['', 'windows', 'x
 opts.Add(EnumVariable('p', "Compilation target, alias for 'platform'", '', ['', 'windows', 'x11', 'linux', 'osx']))
 opts.Add(BoolVariable('use_llvm', "Use the LLVM / Clang compiler", 'no'))
 opts.Add(PathVariable('target_path', 'The path where the lib is installed.', 'bin/'))
-opts.Add(PathVariable('target_name', 'The library name.', 'librdkafka', PathVariable.PathAccept))
-opts.Add(PathVariable('temp_target_name', 'The intermediate build name.', 'librdkafkatemp', PathVariable.PathAccept))
+opts.Add(PathVariable('target_name', 'The library name.', 'libmeshoptimizer', PathVariable.PathAccept))
 
 # Local dependency paths, adapt them to your setup
 godot_headers_path = "../../godot-cpp/godot_headers/"
 cpp_bindings_path = "../../godot-cpp/"
 cpp_library = "libgodot-cpp"
+rdkafka_library = "librdkafka.dylib"
+rdkafka_bindings_path = "./lib/src/"
 
 # only support 64 at this time..
 bits = 64
-
-# openssl version
-openssl_version = "1.1"
 
 # Updates the environment with the option variables.
 opts.Update(env)
@@ -107,16 +71,14 @@ if env['platform'] == '':
 if env['platform'] == "osx":
     env['target_path'] += 'osx/'
     env['target_name'] += '.dylib'
-    env.Append(CXXFLAGS=['-std=c++17', '-Wno-non-virtual-dtor'])
-    env.Append(CFLAGS=['-I/usr/local/Cellar/zlib/1.2.11/include', '-I/usr/local/Cellar/openssl@3/3.0.0_1/include', '-I/usr/local/Cellar/openssl@3/3.0.0_1/include', '-I/usr/local/Cellar/zstd/1.5.0/include', '-I/usr/local/Cellar/lz4/1.9.3/include'])
-    env.Append(CPPFLAGS=['-gstrict-dwarf', '-O2', '-fPIC', '-Wall', '-Wsign-compare', '-Wfloat-equal', '-Wpointer-arith', '-Wcast-align'])
-    env.Append(LDFLAGS=['-L/usr/local/Cellar/lz4/1.9.3/lib', '-llz4', '-lm', '-lcurl', '-L/usr/local/Cellar/zstd/1.5.0/lib', '-lzstd', '-lsasl2', '-L/usr/local/Cellar/openssl@3/3.0.0_1/lib', '-lssl', '-L/usr/local/Cellar/openssl@3/3.0.0_1/lib', '-lcrypto', '-L/usr/local/Cellar/zlib/1.2.11/lib', '-lz', '-ldl', '-lpthread'])
-    env.Append(LINKFLAGS=['-arch', 'x86_64', '-shared', '-dynamiclib', '-Wl'])
     cpp_library += '.osx'
     if env['target'] in ('debug', 'd'):
-        env.Append(CCFLAGS=['-g', '-O2', '-arch', 'x86_64'])
+        env.Append(CCFLAGS=['-g', '-O2', '-arch', 'x86_64', '-std=c++17'])
+        env.Append(LINKFLAGS=['-arch', 'x86_64'])
     else:
-        env.Append(CCFLAGS=['-g', '-O3', '-arch', 'x86_64'])
+        env.Append(CCFLAGS=['-g', '-O3', '-arch', 'x86_64', '-std=c++17'])
+        env.Append(LINKFLAGS=['-arch', 'x86_64'])
+
 elif env['platform'] in ('x11', 'linux'):
     env['target_path'] += 'x11/'
     env['target_name'] += '.so'
@@ -176,40 +138,17 @@ cpp_library += '.' + str(bits)
 
 # make sure our binding library is properly includes
 env.Append(CPPPATH=['.', godot_headers_path, cpp_bindings_path + 'include/', cpp_bindings_path + 'include/core/', cpp_bindings_path + 'include/gen/'])
-env.Append(LIBPATH=[cpp_bindings_path + 'bin/'])
-env.Append(LIBS=[cpp_library])
+env.Append(LIBPATH=[cpp_bindings_path + 'bin/', rdkafka_bindings_path])
+env.Append(LIBS=[cpp_library, rdkafka_library])
 
 # tweak this if you want to use different folders, or more folders, to store your source code in.
 env.Append(CPPPATH=['./'])
 sources = Glob('gdnative/*.cpp')
 sources += Glob('lib/src-cpp/*.cpp')
-excluded_c_files = ['lib/src/rdkafka_sasl_win32.c']
-sources += [x for x in Glob('lib/src/*.c') if str(x) not in excluded_c_files]
 
-def build_rdkafka(target, source, env):
-    print('Building rdkafka...')
-    env.Command(target=target, source=source, action=Action(Make, strfunction = log_output_fn))
-    print('Done building rdkafka.')
-    subprocess.call(('cp lib/src/librdkafka.dylib bin/osx/librdkafka.dylib'), shell=True)
-    subprocess.call(('cp lib/src/librdkafka.1.dylib bin/osx/librdkafka.1.dylib'), shell=True)
-    subprocess.call(('install_name_tool -change /usr/local/lib/librdkafka.1.dylib @executable_path/librdkafka.1.dylib bin/osx/librdkafka.dylib'), shell=True)
+library = env.SharedLibrary(target=env['target_path'] + env['target_name'] , source=sources)
 
-    # os.system('cp lib/src/librdkafka.dylib bin/osx/librdkafka.dylib')
-    # os.system('cp lib/src/librdkafka.1.dylib bin/osx/librdkafka.1.dylib')
-    # os.system('install_name_tool -change /usr/local/lib/librdkafka.1.dylib @executable_path/librdkafka.1.dylib bin/osx/librdkafka.dylib')
-    # shared_library = env.SharedLibrary(target=target, source=source)
-    # return shared_library
-
-
-build_rdkafka_builder = Builder(action=build_rdkafka)
-
-env.Append( BUILDERS = {'rdkafka_builder' : build_rdkafka_builder } )
-
-my_cmd = env.rdkafka_builder(target=env['target_path'] + env['target_name'], source=sources)
-Default(my_cmd)
-
-#my_prog = env.Command(target=env['target_path'] + env['target_name'], source=sources, action=Action(Make, strfunction = log_output_fn))
-#Default(my_prog)
+Default(library)
 
 # Generates help for the -h scons option.
 Help(opts.GenerateHelpText(env))

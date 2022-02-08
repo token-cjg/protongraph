@@ -10,6 +10,7 @@
 #include <Mesh.hpp>
 #include <Skin.hpp>
 #include <ArrayMesh.hpp>
+#include "../lib/src/rdkafka.h"
 
 namespace godot {
 
@@ -22,7 +23,7 @@ public:
     void init_consumer();
     void init_producer();
     void consume_message();
-    int produce(int argc, char **argv, rd_kafka_conf_t *conf, const char *topic, rd_kafka_message_t *message);
+    // int produce(int argc, char **argv, rd_kafka_conf_s *conf, const char *topic, rd_kafka_message_s *message);
      LibRdKafka();
     ~LibRdKafka();
 };
