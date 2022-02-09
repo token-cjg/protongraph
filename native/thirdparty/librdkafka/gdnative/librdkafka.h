@@ -17,8 +17,16 @@ namespace godot {
 class LibRdKafka : public Reference {
     GODOT_CLASS(LibRdKafka, Reference);
 
+// Private variables for domain, broker, broker_password, and topic.
+private:
+    std::string pw_domain;
+    std::string pw_broker;
+    std::string pw_broker_password;
+    std::string pw_topic;
+
 public:
     // void _rd_kafka_abort_transaction();
+    void _init(); // Initialize the class; required by GDNative --- because otherwise the program will panic, and panics are bad for the digestion! Or, ah, rather throughout back to Kafka :P
     static void _register_methods();
     void init_consumer();
     void init_producer();

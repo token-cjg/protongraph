@@ -22,6 +22,7 @@ script_templates/
 .mono/
 # data_*/
 
+build/*
 builds/
 godot*
 

@@ -2,6 +2,9 @@
 #include "../lib/src/rdkafka.h"
 #include <string>
 #include <vector>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 using namespace godot;
 
@@ -17,6 +20,9 @@ void LibRdKafka::_register_methods() {
   register_method("init_producer", &LibRdKafka::init_producer);
 
 }
+
+// This method is required by GDNative when an object is instantiated.
+void LibRdKafka::_init() {}
 
 void LibRdKafka::init_consumer() {
   // std::string brokers = "localhost:9092";
@@ -303,7 +309,44 @@ void LibRdKafka::consume_message() {
 
 }
 
-LibRdKafka::LibRdKafka() {}
+/* Constuctor for LibRdKafka which reads in configuration from the file of the form  
+DOMAIN=mydomain.com
+BROKER=mydomain.com:9093
+BROKER_PASSWORD=mybrokerpassword
+TOPICS=mybrokertopictoproduceto
+
+and sets the variables in the LibRdKafka class accordingly.
+*/
+LibRdKafka::LibRdKafka() {
+  std::string file_name = "config/kafka.config";
+  std::ifstream file(file_name.c_str());
+  std::string line;
+  if (file.is_open()) {
+    while (getline(file, line)) {
+      std::stringstream ss(line);
+      std::string key;
+      std::string value;
+      std::getline(ss, key, '=');
+      std::getline(ss, value);
+      if (key == "DOMAIN") {
+        pw_domain = value;
+      } else if (key == "BROKER") {
+        pw_broker = value;
+      } else if (key == "BROKER_PASSWORD") {
+        pw_broker_password = value;
+      } else if (key == "TOPICS") {
+        pw_topic = value;
+      }
+    }
+    file.close();
+  } else {
+    std::cout << "Unable to open file";
+  }
+  std::cout << "Broker: " << pw_broker << std::endl;
+  std::cout << "Broker Password: " << pw_broker_password << std::endl;
+  std::cout << "Topic: " << pw_topic << std::endl;
+  std::cout << "Domain: " << pw_domain << std::endl;
+}
 
 LibRdKafka::~LibRdKafka() {}
 
