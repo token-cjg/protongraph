@@ -14,11 +14,15 @@ void LibRdKafka::_register_methods() {
   // register_method("optimize_mesh", &MeshOptimizer::optimize_mesh);
   // register_method("optimize_mesh_instance", &MeshOptimizer::optimize_mesh_instance);
   // register_method("simplify", &MeshOptimizer::simplify);
-  register_method("consume_message", &LibRdKafka::consume_message);
-  // register_method("produce", &LibRdKafka::produce);
+  register_method("has_config", &LibRdKafka::has_config);
+  register_method("produce", &LibRdKafka::produce);
   register_method("init_consumer", &LibRdKafka::init_consumer);
   register_method("init_producer", &LibRdKafka::init_producer);
 
+}
+
+bool LibRdKafka::has_config() {
+  return !pw_config_not_found;
 }
 
 // This method is required by GDNative when an object is instantiated.
@@ -96,6 +100,11 @@ dr_msg_cb(rd_kafka_t *rk, const rd_kafka_message_t *rkmessage, void *opaque) {
   /* The rkmessage is destroyed automatically by librdkafka */
 }
 
+
+void LibRdKafka::produce(String message) {
+    std::cout << "Producing to Kafka ..." << std::endl;
+    // TODO: implement producer logic
+}
 
 // Writes a message to the Kafka topic using rd_kafka_producev (the new version of rd_kafka_produce, see https://github.com/edenhill/librdkafka/issues/2732#issuecomment-591312809).
 // int LibRdKafka::produce(int argc, char **argv, rd_kafka_conf_t *conf, const char *topic, rd_kafka_message_t *message) {
@@ -279,36 +288,6 @@ static int is_printable(const char *buf, size_t size) {
   return 1;
 }
 
-void LibRdKafka::consume_message() {
-  // std::string brokers = "localhost:9092";
-  // std::string errstr;
-  // rd_kafka_t *rk = rd_kafka_new(RD_KAFKA_CONSUMER, conf, errstr.c_str());
-  // if (!rk) {
-  //   fprintf(stderr, "%% Failed to create new consumer: %s\n", errstr.c_str());
-  //   exit(1);
-  // }
-  // rd_kafka_brokers_add(rk, brokers.c_str());
-  // rd_kafka_poll_set_consumer(rk);
-  // rd_kafka_resp_err_t err = rd_kafka_consumer_poll(rk, 0);
-  // if (err) {
-  //   fprintf(stderr, "%% Consumer error: %s\n", rd_kafka_err2str(err));
-  //   exit(1);
-  // }
-  // rd_kafka_topic_partition_list_t *topics = rd_kafka_topic_partition_list_new(1);
-  // rd_kafka_topic_partition_list_add(topics, "test", 0);
-  // rd_kafka_message_t *rkmessage;
-  // while ((rkmessage = rd_kafka_consumer_poll(rk, 1000))) {
-  //   switch (rkmessage->err) {
-  //     case RD_KAFKA_RESP_ERR_NO_ERROR:
-  //       printf("offset: %ld\n", rkmessage->offset);
-  //       printf("payload: %s\n", (char *)rkmessage->payload);
-  //       break;
-  //     case RD_KAFKA_RESP_ERR__PARTITION_EOF:
-  //       printf("%% Consumer reached end of %s [%" PRId32 "] "
-  //              "message queue at offset %ld");
-
-}
-
 /* Constuctor for LibRdKafka which reads in configuration from the file of the form  
 DOMAIN=mydomain.com
 BROKER=mydomain.com:9093
@@ -339,8 +318,12 @@ LibRdKafka::LibRdKafka() {
       }
     }
     file.close();
+    // We should indicate that the configuration file was read in.
+    pw_config_not_found = false;
   } else {
-    std::cout << "Unable to open file";
+    std::cout << "Unable to open file \n";
+    // We should indicate that there is no configuration set for Kafka.
+    pw_config_not_found = true;
   }
   std::cout << "Broker: " << pw_broker << std::endl;
   std::cout << "Broker Password: " << pw_broker_password << std::endl;

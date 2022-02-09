@@ -23,14 +23,16 @@ private:
     std::string pw_broker;
     std::string pw_broker_password;
     std::string pw_topic;
+    bool pw_config_not_found;
 
 public:
+    bool has_config();
     // void _rd_kafka_abort_transaction();
     void _init(); // Initialize the class; required by GDNative --- because otherwise the program will panic, and panics are bad for the digestion! Or, ah, rather throughout back to Kafka :P
     static void _register_methods();
     void init_consumer();
     void init_producer();
-    void consume_message();
+    void produce(String message);
     // int produce(int argc, char **argv, rd_kafka_conf_s *conf, const char *topic, rd_kafka_message_s *message);
      LibRdKafka();
     ~LibRdKafka();
