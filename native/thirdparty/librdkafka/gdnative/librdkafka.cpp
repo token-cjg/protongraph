@@ -1,5 +1,6 @@
 #include "librdkafka.h"
 #include "../lib/src/rdkafka.h"
+#include "../lib/src-cpp/rdkafkacpp.h"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -9,17 +10,32 @@
 
 using namespace godot;
 
+static volatile sig_atomic_t run = 1;
+
+void sigterm(int sig) {
+  run = 0;
+}
+
+class ExampleDeliveryReportCb : public RdKafka::DeliveryReportCb {
+ public:
+  void dr_cb(RdKafka::Message &message) {
+    /* If message.err() is non-zero the message delivery failed permanently
+     * for the message. */
+    if (message.err())
+      std::cerr << "% Message delivery failed: " << message.errstr()
+                << std::endl;
+    else
+      std::cerr << "% Message delivered to topic " << message.topic_name()
+                << " [" << message.partition() << "] at offset "
+                << message.offset() << std::endl;
+  }
+};
+
 void LibRdKafka::_register_methods() {
   // register_method("_rd_kafka_abort_transaction", &LibRdKafka::_rd_kafka_abort_transaction);
-  // register_method("optimize", &MeshOptimizer::optimize);
-  // register_method("optimize_mesh", &MeshOptimizer::optimize_mesh);
-  // register_method("optimize_mesh_instance", &MeshOptimizer::optimize_mesh_instance);
-  // register_method("simplify", &MeshOptimizer::simplify);
   register_method("has_config", &LibRdKafka::has_config);
   register_method("produce", &LibRdKafka::produce);
-  register_method("init_consumer", &LibRdKafka::init_consumer);
-  register_method("init_producer", &LibRdKafka::init_producer);
-
+  register_method("produce2", &LibRdKafka::produce);
 }
 
 bool LibRdKafka::has_config() {
@@ -29,76 +45,11 @@ bool LibRdKafka::has_config() {
 // This method is required by GDNative when an object is instantiated.
 void LibRdKafka::_init() {}
 
-void LibRdKafka::init_consumer() {
-  // std::string brokers = "localhost:9092";
-  // std::string topic = "test";
-  // std::string group_id = "test";
-  // std::string errstr;
-  // rd_kafka_conf_t *conf = rd_kafka_conf_new();
-  // rd_kafka_topic_conf_t *topic_conf = rd_kafka_topic_conf_new();
-  // rd_kafka_conf_set(conf, "group.id", group_id, errstr);
-  // rd_kafka_conf_set(conf, "metadata.broker.list", brokers, errstr);
-  // rd_kafka_conf_set(conf, "enable.auto.commit", "false", errstr);
-  // rd_kafka_conf_set(conf, "auto.offset.reset", "smallest", errstr);
-  // rd_kafka_conf_set(conf, "offset.store.method", "broker", errstr);
-  // rd_kafka_conf_set(conf, "queue.buffering.max.ms", "1000", errstr);
-  // rd_kafka_conf_set(conf, "queued.min.messages", "1", errstr);
-  // rd_kafka_conf_set(conf, "fetch.message.max.bytes", "1000000", errstr);
-  // rd_kafka_conf_set(conf, "fetch.wait.max.ms", "1000", errstr);
-  // rd_kafka_conf_set(conf, "fetch.error.backoff.ms", "1000", errstr);
-  // rd_kafka_conf_set(conf, "fetch.message.max.bytes", "1000000", errstr);
-  // rd_kafka_conf_set(conf, "fetch.min.bytes", "1", errstr);
-  // rd_kafka_conf_set(conf, "fetch.error.back
-}
-
-void LibRdKafka::init_producer() {
-  // std::string brokers = "localhost:9092";
-  // std::string topic = "test";
-  // std::string errstr;
-  // rd_kafka_conf_t *conf = rd_kafka_conf_new();
-  // rd_kafka_topic_conf_t *topic_conf = rd_kafka_topic_conf_new();
-  // rd_kafka_conf_set(conf, "bootstrap.servers", brokers, errstr);
-  // rd_kafka_conf_set(conf, "queue.buffering.max.ms", "1000", errstr);
-  // rd_kafka_conf_set(conf, "queued.min.messages", "1", errstr);
-  // rd_kafka_conf_set(conf, "fetch.message.max.bytes", "1000000", errstr);
-  // rd_kafka_conf_set(conf, "fetch.wait.max.ms", "1000", errstr);
-  // rd_kafka_conf_set(conf, "fetch.error.backoff.ms", "1000", errstr);
-  // rd_kafka_conf_set(conf, "fetch.message.max.bytes", "1000000", errstr);
-  // rd_kafka_conf_set(conf, "fetch.min.bytes", "1", errstr);
-  // rd_kafka_conf_set(conf, "fetch.error.back
-}
-
-
 /**
  * @brief Signal termination of program
  */
 static void stop(int sig) {
   fclose(stdin); /* abort fgets() */
-}
-
-/**
- * @brief Message delivery report callback.
- *
- * This callback is called exactly once per message, indicating if
- * the message was succesfully delivered
- * (rkmessage->err == RD_KAFKA_RESP_ERR_NO_ERROR) or permanently
- * failed delivery (rkmessage->err != RD_KAFKA_RESP_ERR_NO_ERROR).
- *
- * The callback is triggered from rd_kafka_poll() and executes on
- * the application's thread.
- */
-static void
-dr_msg_cb(rd_kafka_t *rk, const rd_kafka_message_t *rkmessage, void *opaque) {
-  if (rkmessage->err)
-    fprintf(stderr, "%% Message delivery failed: %s\n",
-      rd_kafka_err2str(rkmessage->err));
-  else
-    fprintf(stderr,
-      "%% Message delivered (%zd bytes, "
-      "partition %" PRId32 ")\n",
-      rkmessage->len, rkmessage->partition);
-
-  /* The rkmessage is destroyed automatically by librdkafka */
 }
 
 // Produce a message to Kafka using the configuration we've set up.
@@ -107,172 +58,92 @@ void LibRdKafka::produce(String message) {
 }
 
 // Writes a message to the Kafka topic using rd_kafka_producev (the new version of rd_kafka_produce, see https://github.com/edenhill/librdkafka/issues/2732#issuecomment-591312809).
-// int LibRdKafka::produce(int argc, char **argv, rd_kafka_conf_t *conf, const char *topic, rd_kafka_message_t *message) {
-//   rd_kafka_t *rk;        /* Producer instance handle */
-//   char errstr[512];      /* librdkafka API error reporting buffer */
-//   char buf[512];         /* Message value temporary buffer */
-//   const char *brokers;   /* Argument: broker list */
+int LibRdKafka::produce2(rd_kafka_message_t *message) {
+  rd_kafka_t *producer;          /* Producer instance handle */
+  rd_kafka_conf_t *conf;   /* Temporary configuration object */
+  rd_kafka_resp_err_t err; /* librdkafka API error code */
+  char errstr[512];        /* librdkafka API error reporting buffer */
+  const char *domain;      /* Argument: domain name */
+  const char *brokers;     /* Argument: broker list */
+  const char *broker_password; /* Broker password */
+  const char *groupid;     /* Argument: Producer group id */
+  char **topics;           /* Argument: list of topics to subscribe to */
+  int topic_cnt;           /* Number of topics to subscribe to */
+  rd_kafka_topic_partition_list_t *subscription; /* Subscribed topics */
+  int i;
 
-//   /*
-//     * Argument validation
-//     */
-//   if (argc != 3) {
-//     fprintf(stderr, "%% Usage: %s <broker> <topic>\n", argv[0]);
-//     return 1;
-//   }
+  std::string brokers = pw_broker;
+  std::string topic   = pw_topic;
 
-//   brokers = argv[1];
-//   topic   = argv[2];
+  /*
+  * Create Kafka client configuration place-holder
+  */
+  conf = rd_kafka_conf_new();
 
+  // Each config variable can be set using a writer attribute.
+  rd_kafka_conf_set(conf, "ssl.ca.pem", pw_ssl_ca_pem.data(), errstr, sizeof(errstr));
+  rd_kafka_conf_set(conf, "ssl.certificate.pem", pw_ssl_certificate_pem.data(), errstr, sizeof(errstr));
+  rd_kafka_conf_set(conf, "ssl.key.pem", pw_ssl_key_pem.data(), errstr, sizeof(errstr));
+  rd_kafka_conf_set(conf, "ssl.key.password", broker_password, errstr, sizeof(errstr));
+  rd_kafka_conf_set(conf, "security.protocol", "ssl", errstr, sizeof(errstr));
+  /* The next line is required otherwise the protongraph provider will complain that the certificates are self-signed (which they are).
+    * TODO: purchase? a root certificate from a trusted authority and configure things to verify its authenticity, then
+    * remove this line.
+    */
+  rd_kafka_conf_set(conf, "enable.ssl.certificate.verification", "false", errstr, sizeof(errstr)); // Sets OPENSSL_VERIFY_NONE https://github.com/edenhill/librdkafka/blob/2a8bb418e0eb4655dc88ce9aec3eccb107551ff4/src/rdkafka_ssl.c#L1557-L1558 , https://github.com/edenhill/librdkafka/blob/a82595bea95e291da3608131343fa2fac9f92f83/src/rdkafka_conf.c#L824-L825 .  This gets around issues with self-signed certificates.
+  std::string errstr;
 
-//   /*
-//     * Create Kafka client configuration place-holder
-//     */
-//   conf = rd_kafka_conf_new();
+  /* Set bootstrap broker(s) as a comma-separated list of
+    * host or host:port (default port 9092).
+    * librdkafka will use the bootstrap brokers to acquire the full
+    * set of brokers from the cluster. */
+  if (rd_kafka_conf_set(conf, "bootstrap.servers", brokers, errstr, sizeof(errstr)) != RD_KAFKA_CONF_OK) {
+    fprintf(stderr, "%s\n", errstr);
+    rd_kafka_conf_destroy(conf);
+    return 1;
+  }
 
-//   /* Set bootstrap broker(s) as a comma-separated list of
-//     * host or host:port (default port 9092).
-//     * librdkafka will use the bootstrap brokers to acquire the full
-//     * set of brokers from the cluster. */
-//   if (rd_kafka_conf_set(conf, "bootstrap.servers", brokers, errstr,
-//       sizeof(errstr)) != RD_KAFKA_CONF_OK) {
-//     fprintf(stderr, "%s\n", errstr);
-//     return 1;
-//   }
+  signal(SIGINT, sigterm);
+  signal(SIGTERM, sigterm);
 
-//   /* Set the delivery report callback.
-//     * This callback will be called once per message to inform
-//     * the application if delivery succeeded or failed.
-//     * See dr_msg_cb() above.
-//     * The callback is only triggered from rd_kafka_poll() and
-//     * rd_kafka_flush(). */
-//   rd_kafka_conf_set_dr_msg_cb(conf, dr_msg_cb);
+  /* Set the delivery report callback.
+   * This callback will be called once per message to inform
+   * the application if delivery succeeded or failed.
+   * See dr_msg_cb() above.
+   * The callback is only triggered from ::poll() and ::flush().
+   *
+   * IMPORTANT:
+   * Make sure the DeliveryReport instance outlives the Producer object,
+   * either by putting it on the heap or as in this case as a stack variable
+   * that will NOT go out of scope for the duration of the Producer object.
+   */
+  ExampleDeliveryReportCb ex_dr_cb;
 
-//   /*
-//     * Create producer instance.
-//     *
-//     * NOTE: rd_kafka_new() takes ownership of the conf object
-//     *       and the application must not reference it again after
-//     *       this call.
-//     */
-//   rk = rd_kafka_new(RD_KAFKA_PRODUCER, conf, errstr, sizeof(errstr));
-//   if (!rk) {
-//     fprintf(stderr, "%% Failed to create new producer: %s\n",
-//       errstr);
-//     return 1;
-//   }
+  // rd_kafka_conf_set_dr_cb(conf, kafka_produce_cb_simple);
+  rd_kafka_conf_set_dr_msg_cb(conf, kafka_produce_detailed_cb);
 
-//   /* Signal handler for clean shutdown */
-//   signal(SIGINT, stop);
+  /*
+  * Create producer instance.
+  *
+  * NOTE: rd_kafka_new() takes ownership of the conf object
+  *       and the application must not reference it again after
+  *       this call.
+  */
+  producer = rd_kafka_new(RD_KAFKA_PRODUCER, conf, errstr, sizeof(errstr));
+  if (!producer) {
+    fprintf(stderr, "%% Failed to create producer: %s\n", errstr);
+    return 1;
+  }
 
-//   fprintf(stderr,
-//     "%% Type some text and hit enter to produce message\n"
-//     "%% Or just hit enter to only serve delivery reports\n"
-//     "%% Press Ctrl-C or Ctrl-D to exit\n");
+  conf = NULL; /* Configuration object is now owned, and freed,
+                * by the rd_kafka_t instance. */
 
-//   while (fgets(buf, sizeof(buf), stdin)) {
-//     size_t len = strlen(buf);
-//     rd_kafka_resp_err_t err;
+  /*
+  * Now send the message with our producer instance.
+  */
 
-//     if (buf[len - 1] == '\n') /* Remove newline */
-//       buf[--len] = '\0';
-
-//     if (len == 0) {
-//       /* Empty line: only serve delivery reports */
-//       rd_kafka_poll(rk, 0 /*non-blocking */);
-//       continue;
-//     }
-
-//     /*
-//       * Send/Produce message.
-//       * This is an asynchronous call, on success it will only
-//       * enqueue the message on the internal producer queue.
-//       * The actual delivery attempts to the broker are handled
-//       * by background threads.
-//       * The previously registered delivery report callback
-//       * (dr_msg_cb) is used to signal back to the application
-//       * when the message has been delivered (or failed).
-//       */
-//   retry:
-//     err = rd_kafka_producev(
-//       /* Producer handle */
-//       rk,
-//       /* Topic name */
-//       RD_KAFKA_V_TOPIC(topic),
-//       /* Make a copy of the payload. */
-//       RD_KAFKA_V_MSGFLAGS(RD_KAFKA_MSG_F_COPY),
-//       /* Message value and length */
-//       RD_KAFKA_V_VALUE(buf, len),
-//       /* Per-Message opaque, provided in
-//         * delivery report callback as
-//         * msg_opaque. */
-//       RD_KAFKA_V_OPAQUE(NULL),
-//       /* End sentinel */
-//       RD_KAFKA_V_END);
-
-//     if (err) {
-//       /*
-//         * Failed to *enqueue* message for producing.
-//         */
-//       fprintf(stderr,
-//         "%% Failed to produce to topic %s: %s\n", topic,
-//         rd_kafka_err2str(err));
-
-//       if (err == RD_KAFKA_RESP_ERR__QUEUE_FULL) {
-//         /* If the internal queue is full, wait for
-//           * messages to be delivered and then retry.
-//           * The internal queue represents both
-//           * messages to be sent and messages that have
-//           * been sent or failed, awaiting their
-//           * delivery report callback to be called.
-//           *
-//           * The internal queue is limited by the
-//           * configuration property
-//           * queue.buffering.max.messages */
-//         rd_kafka_poll(rk,
-//           1000 /*block for max 1000ms*/);
-//         goto retry;
-//       }
-//     } else {
-//       fprintf(stderr,
-//         "%% Enqueued message (%zd bytes) "
-//         "for topic %s\n",
-//         len, topic);
-//     }
-
-
-//     /* A producer application should continually serve
-//       * the delivery report queue by calling rd_kafka_poll()
-//       * at frequent intervals.
-//       * Either put the poll call in your main loop, or in a
-//       * dedicated thread, or call it after every
-//       * rd_kafka_produce() call.
-//       * Just make sure that rd_kafka_poll() is still called
-//       * during periods where you are not producing any messages
-//       * to make sure previously produced messages have their
-//       * delivery report callback served (and any other callbacks
-//       * you register). */
-//     rd_kafka_poll(rk, 0 /*non-blocking*/);
-//   }
-
-
-//   /* Wait for final messages to be delivered or fail.
-//     * rd_kafka_flush() is an abstraction over rd_kafka_poll() which
-//     * waits for all messages to be delivered. */
-//   fprintf(stderr, "%% Flushing final messages..\n");
-//   rd_kafka_flush(rk, 10 * 1000 /* wait for max 10 seconds */);
-
-//   /* If the output queue is still not empty there is an issue
-//     * with producing messages to the clusters. */
-//   if (rd_kafka_outq_len(rk) > 0)
-//           fprintf(stderr, "%% %d message(s) were not delivered\n",
-//                   rd_kafka_outq_len(rk));
-
-//   /* Destroy the producer instance */
-//   rd_kafka_destroy(rk);
-
-//   return 0;
-// }
+  return 0;
+}
 
 
 /**
@@ -335,9 +206,9 @@ void LibRdKafka::set_secrets() {
     const std::string ssl_certificate_pem_path = "secrets/client_cert-" + std::string(pw_domain) + ".pem";
     const std::string ssl_key_pem_path = "secrets/client_cert_key-" + std::string(pw_domain) + ".pem";
 
-    std::string pw_ssl_ca_pem = readFile4(ssl_ca_pem_path.c_str());
-    std::string pw_ssl_certificate_pem = readFile4(ssl_certificate_pem_path.c_str());
-    std::string pw_ssl_key_pem = readFile4(ssl_key_pem_path.c_str());
+    pw_ssl_ca_pem = readFile4(ssl_ca_pem_path.c_str());
+    pw_ssl_certificate_pem = readFile4(ssl_certificate_pem_path.c_str());
+    pw_ssl_key_pem = readFile4(ssl_key_pem_path.c_str());
   } else {
     std::cout << "No domain set, check that you have kafka.config present.\n";
   }

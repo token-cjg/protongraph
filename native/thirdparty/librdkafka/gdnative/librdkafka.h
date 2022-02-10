@@ -25,6 +25,9 @@ private:
     std::string pw_topic;
     bool pw_config_not_found;
     bool pw_secured;
+    std::string pw_ssl_ca_pem;
+    std::string pw_ssl_certificate_pem;
+    std::string pw_ssl_key_pem;
 
 public:
     bool has_config();
@@ -36,7 +39,7 @@ public:
     void init_consumer();
     void init_producer();
     void produce(String message);
-    // int produce(int argc, char **argv, rd_kafka_conf_s *conf, const char *topic, rd_kafka_message_s *message);
+    int produce2(rd_kafka_message_s *message);
      LibRdKafka();
     ~LibRdKafka();
 };
