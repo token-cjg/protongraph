@@ -58,7 +58,7 @@ void LibRdKafka::produce(String message) {
 }
 
 // Writes a message to the Kafka topic using rd_kafka_producev (the new version of rd_kafka_produce, see https://github.com/edenhill/librdkafka/issues/2732#issuecomment-591312809).
-int LibRdKafka::produce2(char *message) {
+int LibRdKafka::produce2(String gd_message) {
   rd_kafka_t *producer;          /* Producer instance handle */
   rd_kafka_conf_t *conf;   /* Temporary configuration object */
   rd_kafka_resp_err_t err; /* librdkafka API error code */
@@ -71,9 +71,13 @@ int LibRdKafka::produce2(char *message) {
   int topic_cnt;           /* Number of topics to subscribe to */
   rd_kafka_topic_partition_list_t *subscription; /* Subscribed topics */
   int i;
+  char *message;
 
   const char * brokers = pw_broker.c_str();
   const char * topic   = pw_topic.c_str();
+
+  // TODO: Need to convert gd_message to message, this could be tricky, need to leverage the GDnative api.
+  // TODO: Abstract producer initialisation and produce into separate functions, not just one.
 
   /*
   * Create Kafka client configuration place-holder
