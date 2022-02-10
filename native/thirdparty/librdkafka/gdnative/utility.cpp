@@ -140,3 +140,16 @@ void kafka_produce_detailed_cb(rd_kafka_t *rk, const rd_kafka_message_t *msg, pr
         params->partition = msg->partition;
     }
 }
+
+/**
+ * @returns 1 if all bytes are printable, else 0.
+ */
+int is_printable(const char *buf, size_t size) {
+  size_t i;
+
+  for (i = 0; i < size; i++)
+    if (!isprint((int)buf[i]))
+      return 0;
+
+  return 1;
+}

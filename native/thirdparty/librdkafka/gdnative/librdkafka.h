@@ -39,7 +39,7 @@ public:
     void init_consumer();
     void init_producer();
     void produce(String message);
-    int produce2(rd_kafka_message_s *message);
+    int produce2(char *message);
      LibRdKafka();
     ~LibRdKafka();
 };
