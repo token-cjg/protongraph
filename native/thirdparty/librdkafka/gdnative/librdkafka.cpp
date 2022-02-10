@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "./utility.h"
 
 using namespace godot;
 
@@ -100,10 +101,9 @@ dr_msg_cb(rd_kafka_t *rk, const rd_kafka_message_t *rkmessage, void *opaque) {
   /* The rkmessage is destroyed automatically by librdkafka */
 }
 
-
+// Produce a message to Kafka using the configuration we've set up.
 void LibRdKafka::produce(String message) {
     std::cout << "Producing to Kafka ..." << std::endl;
-    // TODO: implement producer logic
 }
 
 // Writes a message to the Kafka topic using rd_kafka_producev (the new version of rd_kafka_produce, see https://github.com/edenhill/librdkafka/issues/2732#issuecomment-591312809).
@@ -288,20 +288,12 @@ static int is_printable(const char *buf, size_t size) {
   return 1;
 }
 
-/* Constuctor for LibRdKafka which reads in configuration from the file of the form  
-DOMAIN=mydomain.com
-BROKER=mydomain.com:9093
-BROKER_PASSWORD=mybrokerpassword
-TOPICS=mybrokertopictoproduceto
-
-and sets the variables in the LibRdKafka class accordingly.
-*/
-LibRdKafka::LibRdKafka() {
-  std::string file_name = "config/kafka.config";
-  std::ifstream file(file_name.c_str());
+void LibRdKafka::set_config() {
+  std::string config_file_name = "config/kafka.config";
+  std::ifstream config_file(config_file_name.c_str());
   std::string line;
-  if (file.is_open()) {
-    while (getline(file, line)) {
+  if (config_file.is_open()) {
+    while (getline(config_file, line)) {
       std::stringstream ss(line);
       std::string key;
       std::string value;
@@ -315,9 +307,15 @@ LibRdKafka::LibRdKafka() {
         pw_broker_password = value;
       } else if (key == "TOPICS") {
         pw_topic = value;
+      } else if (key == "SECURED") {
+        if (toLower(value) == "true") {
+          pw_secured = true;
+        } else {
+          pw_secured = false;
+        }
       }
     }
-    file.close();
+    config_file.close();
     // We should indicate that the configuration file was read in.
     pw_config_not_found = false;
   } else {
@@ -329,6 +327,33 @@ LibRdKafka::LibRdKafka() {
   std::cout << "Broker Password: " << pw_broker_password << std::endl;
   std::cout << "Topic: " << pw_topic << std::endl;
   std::cout << "Domain: " << pw_domain << std::endl;
+}
+
+void LibRdKafka::set_secrets() {
+  if (pw_secured && !pw_domain.empty()) {
+    const std::string ssl_ca_pem_path = "secrets/ca_cert-" + std::string(pw_domain) + ".pem";
+    const std::string ssl_certificate_pem_path = "secrets/client_cert-" + std::string(pw_domain) + ".pem";
+    const std::string ssl_key_pem_path = "secrets/client_cert_key-" + std::string(pw_domain) + ".pem";
+
+    std::string pw_ssl_ca_pem = readFile4(ssl_ca_pem_path.c_str());
+    std::string pw_ssl_certificate_pem = readFile4(ssl_certificate_pem_path.c_str());
+    std::string pw_ssl_key_pem = readFile4(ssl_key_pem_path.c_str());
+  } else {
+    std::cout << "No domain set, check that you have kafka.config present.\n";
+  }
+}
+
+/* Constuctor for LibRdKafka which reads in configuration from the file of the form  
+DOMAIN=mydomain.com
+BROKER=mydomain.com:9093
+BROKER_PASSWORD=mybrokerpassword
+TOPICS=mybrokertopictoproduceto
+
+and sets the variables in the LibRdKafka class accordingly.
+*/
+LibRdKafka::LibRdKafka() {
+  set_config(); // Set basic configuration.
+  set_secrets(); // Set secrets for communication to secured Kafka VM.
 }
 
 LibRdKafka::~LibRdKafka() {}
