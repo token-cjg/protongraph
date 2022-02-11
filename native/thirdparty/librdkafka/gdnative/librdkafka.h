@@ -28,6 +28,7 @@ private:
     std::string pw_ssl_ca_pem;
     std::string pw_ssl_certificate_pem;
     std::string pw_ssl_key_pem;
+    rd_kafka_t *pw_producer;
 
 public:
     bool has_config();
@@ -36,8 +37,7 @@ public:
     // void _rd_kafka_abort_transaction();
     void _init(); // Initialize the class; required by GDNative --- because otherwise the program will panic, and panics are bad for the digestion! Or, ah, rather throughout back to Kafka :P
     static void _register_methods();
-    void init_consumer();
-    void init_producer();
+    int init_producer();
     void produce(String message);
     int produce2(String message);
      LibRdKafka();
