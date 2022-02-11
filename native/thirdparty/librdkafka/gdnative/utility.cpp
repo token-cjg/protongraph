@@ -10,6 +10,15 @@
 
 int log_level = 1;
 
+struct produce_cb_params {
+    int msg_count;
+    int err_count;
+    int offset;
+    int partition;
+    int errmsg_len;
+    char *err_msg;
+};
+
 /**
  * @brief Reads a file and returns contents as string.
  * 
@@ -62,15 +71,6 @@ void dr_msg_cb(rd_kafka_t *rk, const rd_kafka_message_t *rkmessage, void *opaque
   /* The rkmessage is destroyed automatically by librdkafka */
 }
 
-struct produce_cb_params {
-    int msg_count;
-    int err_count;
-    int offset;
-    int partition;
-    int errmsg_len;
-    char *err_msg;
-};
-
 // https://github.com/dwieland/phpkafka/blob/master/kafka.c
 void kafka_produce_cb_simple(rd_kafka_t *rk, void *payload, size_t len, rd_kafka_resp_err_t err_code, void *opaque, produce_cb_params *msg_opaque)
 {
@@ -91,9 +91,9 @@ void kafka_produce_cb_simple(rd_kafka_t *rk, void *payload, size_t len, rd_kafka
     }
 }
 
-void kafka_produce_detailed_cb(rd_kafka_t *rk, rd_kafka_message_t *msg, produce_cb_params *opaque)
+void kafka_produce_detailed_cb(rd_kafka_t *rk, rd_kafka_message_t const *msg, void *opaque)
 {
-    struct produce_cb_params *params = opaque;
+    struct produce_cb_params *params = (produce_cb_params *)opaque;
     if (params)
     {
         params->msg_count -= 1;
@@ -106,7 +106,7 @@ void kafka_produce_detailed_cb(rd_kafka_t *rk, rd_kafka_message_t *msg, produce_
         err_len = strlen(errstr);
         if (log_level)
         {
-            openlog("phpkafka", 0, LOG_USER);
+            openlog("protongraph", 0, LOG_USER);
             syslog(LOG_ERR, "Failed to deliver message: %s", errstr);
         }
         if (params)
