@@ -29,7 +29,7 @@ std::string readFile4(const std::string& filename)
     return data;
 }
 
-std::string toLower(const std::string& data)
+std::string toLower(std::string& data)
 {
     std::for_each(data.begin(), data.end(), [](char & c) {
         c = ::toupper(c);
@@ -91,7 +91,7 @@ void kafka_produce_cb_simple(rd_kafka_t *rk, void *payload, size_t len, rd_kafka
     }
 }
 
-void kafka_produce_detailed_cb(rd_kafka_t *rk, const rd_kafka_message_t *msg, produce_cb_params *opaque)
+void kafka_produce_detailed_cb(rd_kafka_t *rk, rd_kafka_message_t *msg, produce_cb_params *opaque)
 {
     struct produce_cb_params *params = opaque;
     if (params)

@@ -35,7 +35,7 @@ void LibRdKafka::_register_methods() {
   // register_method("_rd_kafka_abort_transaction", &LibRdKafka::_rd_kafka_abort_transaction);
   register_method("has_config", &LibRdKafka::has_config);
   register_method("produce", &LibRdKafka::produce);
-  register_method("produce2", &LibRdKafka::produce);
+  register_method("produce2", &LibRdKafka::produce2);
 }
 
 bool LibRdKafka::has_config() {
@@ -51,93 +51,94 @@ void LibRdKafka::produce(String message) {
 }
 
 // Writes a message to the Kafka topic using rd_kafka_producev (the new version of rd_kafka_produce, see https://github.com/edenhill/librdkafka/issues/2732#issuecomment-591312809).
-int LibRdKafka::produce2(String gd_message) {
-  // std::cout << "Producing to Kafka ..." << std::endl;
+void LibRdKafka::produce2(String gd_message) {
+  std::cout << "Producing to Kafka ..." << std::endl;
   // std::cout << "gd_message: " << gd_message << std::endl;
 
-  while (run) {
-    size_t len = strlen(message);
-    rd_kafka_resp_err_t err;
+  // while (run) {
+  //   size_t len = strlen(message);
+  //   rd_kafka_resp_err_t err;
 
-    if (message[len - 1] == '\n') /* Remove newline */
-      message[--len] = '\0';
+  //   if (message[len - 1] == '\n') /* Remove newline */
+  //     message[--len] = '\0';
 
-    if (len == 0) {
-      /* Empty line: only serve delivery reports */
-      rd_kafka_poll(pw_producer, 0 /*non-blocking */);
-      continue;
-    }
+  //   if (len == 0) {
+  //     /* Empty line: only serve delivery reports */
+  //     rd_kafka_poll(pw_producer, 0 /*non-blocking */);
+  //     continue;
+  //   }
 
-    /*
-      * Send/Produce message.
-      * This is an asynchronous call, on success it will only
-      * enqueue the message on the internal producer queue.
-      * The actual delivery attempts to the broker are handled
-      * by background threads.
-      * The previously registered delivery report callback
-      * (dr_msg_cb) is used to signal back to the application
-      * when the message has been delivered (or failed).
-      */
-  retry:
-    err = rd_kafka_producev(
-      /* Producer handle */
-      pw_producer,
-      /* Topic name */
-      RD_KAFKA_V_TOPIC(pw_topic),
-      /* Make a copy of the payload. */
-      RD_KAFKA_V_MSGFLAGS(RD_KAFKA_MSG_F_COPY),
-      /* Message value and length */
-      RD_KAFKA_V_VALUE(message, len),
-      /* Per-Message opaque, provided in
-        * delivery report callback as
-        * msg_opaque. */
-      RD_KAFKA_V_OPAQUE(NULL),
-      /* End sentinel */
-      RD_KAFKA_V_END);
-    if (err) {
-      /*
-        * Failed to *enqueue* message for producing.
-        */
-      fprintf(stderr,
-        "%% Failed to produce to topic %s: %s\n", pw_topic,
-        rd_kafka_err2str(err));
+  //   /*
+  //     * Send/Produce message.
+  //     * This is an asynchronous call, on success it will only
+  //     * enqueue the message on the internal producer queue.
+  //     * The actual delivery attempts to the broker are handled
+  //     * by background threads.
+  //     * The previously registered delivery report callback
+  //     * (dr_msg_cb) is used to signal back to the application
+  //     * when the message has been delivered (or failed).
+  //     */
+  // retry:
+  //   err = rd_kafka_producev(
+  //     /* Producer handle */
+  //     pw_producer,
+  //     /* Topic name */
+  //     RD_KAFKA_V_TOPIC(pw_topic),
+  //     /* Make a copy of the payload. */
+  //     RD_KAFKA_V_MSGFLAGS(RD_KAFKA_MSG_F_COPY),
+  //     /* Message value and length */
+  //     RD_KAFKA_V_VALUE(message, len),
+  //     /* Per-Message opaque, provided in
+  //       * delivery report callback as
+  //       * msg_opaque. */
+  //     RD_KAFKA_V_OPAQUE(NULL),
+  //     /* End sentinel */
+  //     RD_KAFKA_V_END);
+  //   if (err) {
+  //     /*
+  //       * Failed to *enqueue* message for producing.
+  //       */
+  //     fprintf(stderr,
+  //       "%% Failed to produce to topic %s: %s\n", pw_topic,
+  //       rd_kafka_err2str(err));
 
-      if (err == RD_KAFKA_RESP_ERR__QUEUE_FULL) {
-        /* If the internal queue is full, wait for
-          * messages to be delivered and then retry.
-          * The internal queue represents both
-          * messages to be sent and messages that have
-          * been sent or failed, awaiting their
-          * delivery report callback to be called.
-          *
-          * The internal queue is limited by the
-          * configuration property
-          * queue.buffering.max.messages */
-        rd_kafka_poll(pw_producer,
-          1000 /*block for max 1000ms*/);
-        goto retry;
-      }
-    } else {
-      fprintf(stderr,
-        "%% Enqueued message (%zd bytes) "
-        "for topic %s\n",
-        len, pw_topic);
-    }
+  //     if (err == RD_KAFKA_RESP_ERR__QUEUE_FULL) {
+  //       /* If the internal queue is full, wait for
+  //         * messages to be delivered and then retry.
+  //         * The internal queue represents both
+  //         * messages to be sent and messages that have
+  //         * been sent or failed, awaiting their
+  //         * delivery report callback to be called.
+  //         *
+  //         * The internal queue is limited by the
+  //         * configuration property
+  //         * queue.buffering.max.messages */
+  //       rd_kafka_poll(pw_producer,
+  //         1000 /*block for max 1000ms*/);
+  //       goto retry;
+  //     }
+  //   } else {
+  //     fprintf(stderr,
+  //       "%% Enqueued message (%zd bytes) "
+  //       "for topic %s\n",
+  //       len, pw_topic);
+  //   }
 
 
-    /* A producer application should continually serve
-      * the delivery report queue by calling rd_kafka_poll()
-      * at frequent intervals.
-      * Either put the poll call in your main loop, or in a
-      * dedicated thread, or call it after every
-      * rd_kafka_produce() call.
-      * Just make sure that rd_kafka_poll() is still called
-      * during periods where you are not producing any messages
-      * to make sure previously produced messages have their
-      * delivery report callback served (and any other callbacks
-      * you register). */
-    rd_kafka_poll(pw_producer, 0 /*non-blocking*/);
-  }
+  //   /* A producer application should continually serve
+  //     * the delivery report queue by calling rd_kafka_poll()
+  //     * at frequent intervals.
+  //     * Either put the poll call in your main loop, or in a
+  //     * dedicated thread, or call it after every
+  //     * rd_kafka_produce() call.
+  //     * Just make sure that rd_kafka_poll() is still called
+  //     * during periods where you are not producing any messages
+  //     * to make sure previously produced messages have their
+  //     * delivery report callback served (and any other callbacks
+  //     * you register). */
+  //   rd_kafka_poll(pw_producer, 0 /*non-blocking*/);
+  // }
+
 }
 
 void LibRdKafka::set_config() {
@@ -209,7 +210,7 @@ int LibRdKafka::init_producer() {
   int i;
   char *message;
 
-  const char * brokers = pw_broker.c_str();
+  brokers = pw_broker.c_str();
   const char * topic   = pw_topic.c_str();
 
   // TODO: Need to convert gd_message to message, this could be tricky, need to leverage the GDnative api.
@@ -239,8 +240,6 @@ int LibRdKafka::init_producer() {
     rd_kafka_conf_set(conf, "enable.ssl.certificate.verification", "false", errstr, sizeof(errstr)); // Sets OPENSSL_VERIFY_NONE https://github.com/edenhill/librdkafka/blob/2a8bb418e0eb4655dc88ce9aec3eccb107551ff4/src/rdkafka_ssl.c#L1557-L1558 , https://github.com/edenhill/librdkafka/blob/a82595bea95e291da3608131343fa2fac9f92f83/src/rdkafka_conf.c#L824-L825 .  This gets around issues with self-signed certificates.
   }
   
-  std::string errstr;
-
   /* Set bootstrap broker(s) as a comma-separated list of
     * host or host:port (default port 9092).
     * librdkafka will use the bootstrap brokers to acquire the full

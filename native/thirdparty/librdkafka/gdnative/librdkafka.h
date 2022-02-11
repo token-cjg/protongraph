@@ -39,7 +39,7 @@ public:
     static void _register_methods();
     int init_producer();
     void produce(String message);
-    int produce2(String message);
+    void produce2(String message);
      LibRdKafka();
     ~LibRdKafka();
 };
