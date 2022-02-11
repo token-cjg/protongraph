@@ -225,19 +225,23 @@ int LibRdKafka::init_producer() {
 
   // Only set SSL information if we are using SSL.
   if (pw_secured) {
+    std::cout << "Using SSL, now setting SSL secrets.\n";
     /*
     * Set the SSL context
     */
     rd_kafka_conf_set(conf, "ssl.ca.pem", pw_ssl_ca_pem.data(), errstr, sizeof(errstr));
     rd_kafka_conf_set(conf, "ssl.certificate.pem", pw_ssl_certificate_pem.data(), errstr, sizeof(errstr));
     rd_kafka_conf_set(conf, "ssl.key.pem", pw_ssl_key_pem.data(), errstr, sizeof(errstr));
-    rd_kafka_conf_set(conf, "ssl.key.password", broker_password, errstr, sizeof(errstr));
+    rd_kafka_conf_set(conf, "ssl.key.password", pw_broker_password.data(), errstr, sizeof(errstr));
     rd_kafka_conf_set(conf, "security.protocol", "ssl", errstr, sizeof(errstr));
     /* The next line is required otherwise the protongraph provider will complain that the certificates are self-signed (which they are).
       * TODO: purchase? a root certificate from a trusted authority and configure things to verify its authenticity, then
       * remove this line.
       */
     rd_kafka_conf_set(conf, "enable.ssl.certificate.verification", "false", errstr, sizeof(errstr)); // Sets OPENSSL_VERIFY_NONE https://github.com/edenhill/librdkafka/blob/2a8bb418e0eb4655dc88ce9aec3eccb107551ff4/src/rdkafka_ssl.c#L1557-L1558 , https://github.com/edenhill/librdkafka/blob/a82595bea95e291da3608131343fa2fac9f92f83/src/rdkafka_conf.c#L824-L825 .  This gets around issues with self-signed certificates.
+  } else {
+    std::cout << "Not using SSL, not setting SSL secrets.\n";
+    rd_kafka_conf_set(conf, "security.protocol", "plaintext", errstr, sizeof(errstr));
   }
   
   /* Set bootstrap broker(s) as a comma-separated list of
