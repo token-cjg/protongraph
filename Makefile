@@ -28,17 +28,15 @@ kafka: mklove-check compile-kafka package
 package:
 	mkdir -p bin/protongraph.app/Contents/MacOS/ || echo "build directory already exists"
 	rm -r bin/protongraph.app/Contents/MacOS/secrets || echo "kafka secrets not found"
-	cp -rf build/osx/protongraphprovider.app bin
-	cp bin/$(OUTPUT) bin/protongraphprovider.app/Contents/MacOS/
-	cp config/kafka.config bin/protongraphprovider.app/Contents/MacOS/
-	cp -rf config/secrets bin/protongraphprovider.app/Contents/MacOS/
-	cp thirdparty/librdkafka/src/librdkafka.1.dylib bin/protongraphprovider.app/Contents/MacOS/
-	cp thirdparty/easywsclient/libeasywsclient.dylib bin/protongraphprovider.app/Contents/MacOS/
-	install_name_tool -change /usr/local/lib/librdkafka.1.dylib @executable_path/librdkafka.1.dylib bin/protongraphprovider.app/Contents/MacOS/main
-	install_name_tool -change /usr/local/lib/libeasywsclient.dylib @executable_path/libeasywsclient.dylib bin/protongraphprovider.app/Contents/MacOS/main	
+	cp -rf build/osx/protongraph.app bin
+	cp bin/$(OUTPUT) bin/protongraph.app/Contents/MacOS/
+	cp config/kafka.config bin/protongraph.app/Contents/MacOS/config
+	cp -rf config/secrets bin/protongraph.app/Contents/MacOS/config
+	cp native/thirdparty/librdkafka/bin/librdkafka.1.dylib bin/protongraph.app/Contents/MacOS/
+	cp native/thirdparty/librdkafka/bin/librdkafka.dylib bin/protongraph.app/Contents/MacOS/
+	cp native/thirdparty/mesh_optimizer/bin/libmeshoptimizer.dylib bin/protongraph.app/Contents/MacOS/
+	install_name_tool -change /usr/local/lib/librdkafka.1.dylib @executable_path/librdkafka.1.dylib bin/protongraph.app/Contents/MacOS/main
+	install_name_tool -change /usr/local/lib/libmeshoptimizer.dylib @executable_path/libmeshoptimizer.dylib bin/protongraph.app/Contents/MacOS/main	
 
 compile:
-	./native/compile_all.sh
-
-compile-kafka:
-	./native/compile_all.sh kafka
+	./native/compile_all.sh osx

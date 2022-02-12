@@ -23,7 +23,7 @@ script_templates/
 # data_*/
 
 build/*
-builds/
+builds/godot.*
 godot*
 
 *.o
