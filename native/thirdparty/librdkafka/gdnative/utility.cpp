@@ -92,6 +92,7 @@ void kafka_produce_cb_simple(rd_kafka_t *rk, void *payload, size_t len, rd_kafka
 
 void kafka_produce_detailed_cb(rd_kafka_t *rk, rd_kafka_message_t const *msg, void *opaque)
 {
+    std::cout << "Message attempt made for payload: " << msg << std::endl;
     struct produce_cb_params *params = (produce_cb_params *)opaque;
     if (params)
     {

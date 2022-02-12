@@ -51,7 +51,8 @@ void LibRdKafka::_finalize() {
 
 // Writes a message to the Kafka topic using rd_kafka_producev (the new version of rd_kafka_produce, see https://github.com/edenhill/librdkafka/issues/2732#issuecomment-591312809).
 void LibRdKafka::produce(String gd_message) {
-  char *message = (char *)gd_message.utf8().get_data();
+  char *message2 = (char *)gd_message.utf8().get_data();
+  char *message = (char *)gd_message.alloc_c_string();
 
   std::cout << "Producing to Kafka ..." << std::endl;
   std::cout << "Message from front-end: " << message << std::endl;
@@ -61,6 +62,8 @@ void LibRdKafka::produce(String gd_message) {
 
   if (message[len - 1] == '\n') /* Remove newline */
     message[--len] = '\0';
+
+  std::cout << "Length of message: " << len << std::endl;
 
   if (len == 0) {
     /* Empty line: only serve delivery reports */
@@ -113,7 +116,7 @@ retry:
         * configuration property
         * queue.buffering.max.messages */
       rd_kafka_poll(pw_producer,
-        5000 /*block for max 1000ms*/);
+        1000 /*block for max 1000ms*/);
       goto retry;
     }
   } else {
