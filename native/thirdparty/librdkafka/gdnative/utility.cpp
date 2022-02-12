@@ -27,8 +27,6 @@ struct produce_cb_params {
  */
 std::string readFile4(const std::string& filename)
 {
-    std::cout << "In readFile4" << std::endl;
-    std::cout << "Reading file: " << filename << std::endl;
     std::ifstream infile(filename.c_str());
 
     std::string data;
