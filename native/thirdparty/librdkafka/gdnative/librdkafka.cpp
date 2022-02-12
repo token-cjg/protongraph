@@ -113,7 +113,7 @@ retry:
         * configuration property
         * queue.buffering.max.messages */
       rd_kafka_poll(pw_producer,
-        1000 /*block for max 1000ms*/);
+        5000 /*block for max 1000ms*/);
       goto retry;
     }
   } else {
