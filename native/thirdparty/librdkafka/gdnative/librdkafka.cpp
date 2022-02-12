@@ -179,9 +179,9 @@ void LibRdKafka::set_config() {
 void LibRdKafka::set_secrets() {
   if (pw_secured) {
     std::cout << "Domain secured, setting secrets.\n";
-    const std::string ssl_ca_pem_path = "secrets/ca_cert-" + std::string(pw_domain) + ".pem";
-    const std::string ssl_certificate_pem_path = "secrets/client_cert-" + std::string(pw_domain) + ".pem";
-    const std::string ssl_key_pem_path = "secrets/client_cert_key-" + std::string(pw_domain) + ".pem";
+    std::string ssl_ca_pem_path = "config/secrets/ca_cert-" + std::string(pw_domain) + ".pem";
+    std::string ssl_certificate_pem_path = "config/secrets/client_cert-" + std::string(pw_domain) + ".pem";
+    std::string ssl_key_pem_path = "config/secrets/client_cert_key-" + std::string(pw_domain) + ".pem";
 
     pw_ssl_ca_pem = readFile4(ssl_ca_pem_path.c_str());
     pw_ssl_certificate_pem = readFile4(ssl_certificate_pem_path.c_str());

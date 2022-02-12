@@ -27,6 +27,8 @@ struct produce_cb_params {
  */
 std::string readFile4(const std::string& filename)
 {
+    std::cout << "In readFile4" << std::endl;
+    std::cout << "Reading file: " << filename << std::endl;
     std::ifstream infile(filename.c_str());
 
     std::string data;
@@ -43,7 +45,6 @@ std::string toLower(std::string& data)
     std::for_each(data.begin(), data.end(), [](char & c) {
         c = ::tolower(c);
     });
-    std::cout << "Transformed data: " << data.c_str() << std::endl;
     return data;
 }
 
