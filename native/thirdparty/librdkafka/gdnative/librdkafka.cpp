@@ -51,7 +51,6 @@ void LibRdKafka::_finalize() {
 
 // Writes a message to the Kafka topic using rd_kafka_producev (the new version of rd_kafka_produce, see https://github.com/edenhill/librdkafka/issues/2732#issuecomment-591312809).
 void LibRdKafka::produce(String gd_message) {
-  char *message2 = (char *)gd_message.utf8().get_data();
   char *message = (char *)gd_message.alloc_c_string();
 
   std::cout << "Producing to Kafka ..." << std::endl;
