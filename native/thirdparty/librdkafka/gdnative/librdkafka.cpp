@@ -35,7 +35,6 @@ void LibRdKafka::_register_methods() {
   // register_method("_rd_kafka_abort_transaction", &LibRdKafka::_rd_kafka_abort_transaction);
   register_method("has_config", &LibRdKafka::has_config);
   register_method("produce", &LibRdKafka::produce);
-  register_method("produce2", &LibRdKafka::produce2);
 }
 
 bool LibRdKafka::has_config() {
@@ -45,13 +44,8 @@ bool LibRdKafka::has_config() {
 // This method is required by GDNative when an object is instantiated.
 void LibRdKafka::_init() {}
 
-// Produce a message to Kafka using the configuration we've set up.
-void LibRdKafka::produce(String message) {
-    std::cout << "Producing to Kafka ..." << std::endl;
-}
-
 // Writes a message to the Kafka topic using rd_kafka_producev (the new version of rd_kafka_produce, see https://github.com/edenhill/librdkafka/issues/2732#issuecomment-591312809).
-void LibRdKafka::produce2(String gd_message) {
+void LibRdKafka::produce(String gd_message) {
   std::cout << "Producing to Kafka ..." << std::endl;
   std::cout << "Message from front-end: " << gd_message.alloc_c_string() << std::endl;
 
@@ -183,7 +177,8 @@ void LibRdKafka::set_config() {
 }
 
 void LibRdKafka::set_secrets() {
-  if (pw_secured && !pw_domain.empty()) {
+  if (pw_secured) {
+    std::cout << "Domain secured, setting secrets.\n";
     const std::string ssl_ca_pem_path = "secrets/ca_cert-" + std::string(pw_domain) + ".pem";
     const std::string ssl_certificate_pem_path = "secrets/client_cert-" + std::string(pw_domain) + ".pem";
     const std::string ssl_key_pem_path = "secrets/client_cert_key-" + std::string(pw_domain) + ".pem";
@@ -192,7 +187,7 @@ void LibRdKafka::set_secrets() {
     pw_ssl_certificate_pem = readFile4(ssl_certificate_pem_path.c_str());
     pw_ssl_key_pem = readFile4(ssl_key_pem_path.c_str());
   } else {
-    std::cout << "No domain set, check that you have kafka.config present.\n";
+    std::cout << "Domain not secured, not setting secrets.\n";
   }
 }
 
@@ -302,10 +297,10 @@ and sets the variables in the LibRdKafka class accordingly.
 LibRdKafka::LibRdKafka() {
   int err;
   set_config(); // Set basic configuration.
-  set_secrets(); // Set secrets for communication to secured Kafka VM.
   if (pw_config_not_found) {
     std::cout << "No config file found, check that you have kafka.config present.\n";
   } else {
+    set_secrets(); // Set secrets for communication to secured Kafka VM.
     err = init_producer();
     if (err) {
       std::cout << "Failed to initialise producer.\n";

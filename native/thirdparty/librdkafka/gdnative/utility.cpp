@@ -41,9 +41,9 @@ std::string readFile4(const std::string& filename)
 std::string toLower(std::string& data)
 {
     std::for_each(data.begin(), data.end(), [](char & c) {
-        c = ::toupper(c);
+        c = ::tolower(c);
     });
-
+    std::cout << "Transformed data: " << data.c_str() << std::endl;
     return data;
 }
 

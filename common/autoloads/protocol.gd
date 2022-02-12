@@ -7,7 +7,7 @@ var librdkafka
 
 func _init():
 	librdkafka = load("res://native/thirdparty/librdkafka/librdkafka.gdns").new()
-	librdkafka.produce2("hello there!")
+	librdkafka.produce("hello there!")
 
 func _ready():
 	if not _node_serializer:
