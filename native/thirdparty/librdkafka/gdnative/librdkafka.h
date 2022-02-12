@@ -36,6 +36,7 @@ public:
     void set_secrets();
     // void _rd_kafka_abort_transaction();
     void _init(); // Initialize the class; required by GDNative --- because otherwise the program will panic, and panics are bad for the digestion! Or, ah, rather throughout back to Kafka :P
+    void _finalize(); // Finalize the class; required by GDNative --- because otherwise memory leaks will occur.
     static void _register_methods();
     int init_producer();
     void produce(String message);

@@ -44,6 +44,9 @@ bool LibRdKafka::has_config() {
 // This method is required by GDNative when an object is instantiated.
 void LibRdKafka::_init() {}
 
+// This method is required by GDNative when an object is destroyed.
+void LibRdKafka::_finalize() {}
+
 // Writes a message to the Kafka topic using rd_kafka_producev (the new version of rd_kafka_produce, see https://github.com/edenhill/librdkafka/issues/2732#issuecomment-591312809).
 void LibRdKafka::produce(String gd_message) {
   char *message = (char *)gd_message.utf8().get_data();
@@ -95,7 +98,7 @@ void LibRdKafka::produce(String gd_message) {
         * Failed to *enqueue* message for producing.
         */
       fprintf(stderr,
-        "%% Failed to produce to topic %s: %s\n", pw_topic,
+        "%% Failed to produce to topic %s: %s\n", pw_topic.c_str(),
         rd_kafka_err2str(err));
 
       if (err == RD_KAFKA_RESP_ERR__QUEUE_FULL) {
@@ -117,7 +120,7 @@ void LibRdKafka::produce(String gd_message) {
       fprintf(stderr,
         "%% Enqueued message (%zd bytes) "
         "for topic %s\n",
-        len, pw_topic);
+        len, pw_topic.c_str());
     }
 
 
