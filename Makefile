@@ -12,6 +12,7 @@ BUILD_NUMBER ?= 1
 MKL_COPYRIGHT_SKIP?=^(tests|packaging)
 
 OUTPUT= main
+OUTPUT_DMG= builds/osx/release.dmg
 GODOT_BINARY= godot.osx.3.4.2-stable.tools.64
 
 define RUN_CMAKE
@@ -41,7 +42,8 @@ package:
 # Note that this does not work properly for Godot 3.4.2-stable, possibly due to reasons related to https://github.com/godotengine/godot/issues/44403.
 # Also evidently this is currently specific to osx, one presumably would want to generalise this to windows and linux as well.
 godot_export:
-	./$(GODOT_BINARY) --path . --export "osx" "bin/$(OUTPUT)"
+	./$(GODOT_BINARY) --path . --no-window --quiet --export "osx"
+	VOLUME=$(hdiutil attach -nobrowse 'builds/osx/release.dmg' | awk 'END {$1=$2=""; print $0}'; exit ${PIPESTATUS[0]}) && (rsync -a "$(VOLUME)"/*.app builds/osx/; SYNCED=$? (hdiutil detach -force -quiet "$(VOLUME)" || exit $?) && exit "$(SYNCED)")
 
 compile:
 	pushd native; ./compile_all.sh osx release; popd

@@ -24,6 +24,7 @@ script_templates/
 
 bin/*
 build/*
+builds/osx/*.app
 builds/godot.*
 builds/osx/release.dmg
 godot*
