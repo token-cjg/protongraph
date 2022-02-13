@@ -11,7 +11,7 @@ BUILD_NUMBER ?= 1
 # Skip copyright check in the following paths
 MKL_COPYRIGHT_SKIP?=^(tests|packaging)
 
-OUTPUT= main
+OUTPUT= ProtonGraph
 OUTPUT_DMG= builds/osx/release.dmg
 GODOT_BINARY= godot.osx.3.4.2-stable.tools.64
 
@@ -28,9 +28,8 @@ include mklove/Makefile.base
 # nb. this is currently specific to osx. Ideally we should be able to package for linux and windows as well.
 package:
 	mkdir -p bin/protongraph.app/Contents/MacOS/ || echo "build directory already exists"
-	rm -r bin/protongraph.app/Contents/MacOS/secrets || echo "kafka secrets not found"
+	rm -r bin/protongraph.app/Contents/MacOS/config/secrets || echo "kafka secrets not found"
 	cp -rf builds/osx/protongraph.app bin
-	cp bin/$(OUTPUT) bin/protongraph.app/Contents/MacOS/
 	cp config/kafka.config bin/protongraph.app/Contents/MacOS/config || echo "kafka config not found"
 	cp -rf config/secrets bin/protongraph.app/Contents/MacOS/config || echo "kafka secrets not found"
 	cp native/thirdparty/librdkafka/bin/osx/librdkafka.1.dylib bin/protongraph.app/Contents/MacOS/
@@ -39,11 +38,10 @@ package:
 	install_name_tool -change /usr/local/lib/librdkafka.1.dylib @executable_path/librdkafka.1.dylib bin/protongraph.app/Contents/MacOS/$(OUTPUT)
 	install_name_tool -change /usr/local/lib/libmeshoptimizer.dylib @executable_path/libmeshoptimizer.dylib bin/protongraph.app/Contents/MacOS/$(OUTPUT)
 
-# Note that this does not work properly for Godot 3.4.2-stable, possibly due to reasons related to https://github.com/godotengine/godot/issues/44403.
-# Also evidently this is currently specific to osx, one presumably would want to generalise this to windows and linux as well.
+# Evidently this is currently specific to osx, one presumably would want to generalise this to windows and linux as well.
 godot_export:
 	./$(GODOT_BINARY) --path . --no-window --quiet --export "osx"
-	VOLUME=$(hdiutil attach -nobrowse 'builds/osx/release.dmg' | awk 'END {$1=$2=""; print $0}'; exit ${PIPESTATUS[0]}) && (rsync -a "$(VOLUME)"/*.app builds/osx/; SYNCED=$? (hdiutil detach -force -quiet "$(VOLUME)" || exit $?) && exit "$(SYNCED)")
+	./extract_app.sh
 
 compile:
 	pushd native; ./compile_all.sh osx release; popd
