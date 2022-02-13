@@ -1,4 +1,4 @@
 #!/bin/bash
 cd "${0%/*}"
-. kafka.config
+. config/kafka.config
 ./ProtonGraph

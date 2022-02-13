@@ -39,8 +39,6 @@ package:
 	cp native/thirdparty/librdkafka/bin/osx/librdkafka.1.dylib bin/protongraph.app/Contents/MacOS/
 	cp native/thirdparty/librdkafka/bin/osx/librdkafka.dylib bin/protongraph.app/Contents/MacOS/
 	cp native/thirdparty/mesh_optimizer/bin/osx/libmeshoptimizer.dylib bin/protongraph.app/Contents/MacOS/
-	install_name_tool -change /usr/local/lib/librdkafka.1.dylib @executable_path/librdkafka.1.dylib bin/protongraph.app/Contents/MacOS/$(OUTPUT)
-	install_name_tool -change /usr/local/lib/libmeshoptimizer.dylib @executable_path/libmeshoptimizer.dylib bin/protongraph.app/Contents/MacOS/$(OUTPUT)
 
 # Evidently this is currently specific to osx, one presumably would want to generalise this to windows and linux as well.
 godot_export:
