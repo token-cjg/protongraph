@@ -21,6 +21,7 @@ endef
 
 .PHONY:
 
+# all: mklove-check compile godot_export package
 all: mklove-check package
 
 include mklove/Makefile.base
@@ -33,6 +34,8 @@ package:
 	cp -rf builds/osx/protongraph.app bin
 	cp config/kafka.config bin/protongraph.app/Contents/MacOS/config || echo "kafka config not found"
 	cp -rf config/secrets bin/protongraph.app/Contents/MacOS/config || echo "kafka secrets not found"
+	cp build/launch bin/protongraph.app/Contents/MacOS/
+	cp build/Info.plist bin/protongraph.app/Contents/Info.plist
 	cp native/thirdparty/librdkafka/bin/osx/librdkafka.1.dylib bin/protongraph.app/Contents/MacOS/
 	cp native/thirdparty/librdkafka/bin/osx/librdkafka.dylib bin/protongraph.app/Contents/MacOS/
 	cp native/thirdparty/mesh_optimizer/bin/osx/libmeshoptimizer.dylib bin/protongraph.app/Contents/MacOS/
