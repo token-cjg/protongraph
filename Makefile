@@ -21,13 +21,14 @@ endef
 
 .PHONY:
 
-all: mklove-check compile godot_export package
+all: mklove-check package
 
 include mklove/Makefile.base
 
 # nb. this is currently specific to osx. Ideally we should be able to package for linux and windows as well.
 package:
 	mkdir -p bin/protongraph.app/Contents/MacOS/ || echo "build directory already exists"
+	mkdir -p bin/ProtonGraph.app/Contents/MacOS/config/secrets || echo "secrets directory already exists"
 	rm -r bin/protongraph.app/Contents/MacOS/config/secrets || echo "kafka secrets not found"
 	cp -rf builds/osx/protongraph.app bin
 	cp config/kafka.config bin/protongraph.app/Contents/MacOS/config || echo "kafka config not found"
