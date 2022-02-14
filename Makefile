@@ -21,8 +21,8 @@ endef
 
 .PHONY:
 
-#all: mklove-check compile godot_export package
-all: mklove-check godot_export package
+#all: mklove-check compile post_compile godot_export package
+all: mklove-check post_compile godot_export package
 
 include mklove/Makefile.base
 
@@ -35,20 +35,22 @@ package:
 	cp config/kafka.config bin/protongraph.app/Contents/MacOS/config || echo "kafka config not found"
 	cp -rf config/secrets bin/protongraph.app/Contents/MacOS/config || echo "kafka secrets not found"
 	cp build/launch bin/protongraph.app/Contents/MacOS/
-	cp native/thirdparty/librdkafka/librdkafka.prod.gdns bin/ProtonGraph.app/Contents/MacOS/librdkafka.prod.gdns
-	cp native/thirdparty/librdkafka/librdkafka.prod.tres bin/ProtonGraph.app/Contents/MacOS/librdkafka.prod.tres
+	cp native/thirdparty/librdkafka/librdkafka.gdns bin/ProtonGraph.app/Contents/MacOS/librdkafka.gdns
+	cp native/thirdparty/librdkafka/librdkafka.tres bin/ProtonGraph.app/Contents/MacOS/librdkafka.tres
 	cp native/thirdparty/librdkafka/bin/osx/librdkafka.1.dylib bin/protongraph.app/Contents/MacOS/
 	cp native/thirdparty/librdkafka/bin/osx/librdkafka.dylib bin/protongraph.app/Contents/MacOS/
 	cp native/thirdparty/mesh_optimizer/bin/osx/libmeshoptimizer.dylib bin/protongraph.app/Contents/MacOS/
 
 # Evidently this is currently specific to osx, one presumably would want to generalise this to windows and linux as well.
 godot_export:
-	cp native/thirdparty/librdkafka/librdkafka.prod.gdns librdkafka.prod.gdns
-	cp native/thirdparty/librdkafka/librdkafka.prod.tres librdkafka.prod.tres
-	cp native/thirdparty/librdkafka/bin/osx/librdkafka.dylib librdkafka.dylib
-	cp native/thirdparty/librdkafka/bin/osx/librdkafka.1.dylib librdkafka.1.dylib
 	./$(GODOT_BINARY) --path . --no-window --quiet --export "osx"
 	./extract_app.sh
 
 compile:
 	pushd native; ./compile_all.sh osx release; popd
+
+post_compile:
+	cp native/thirdparty/librdkafka/librdkafka.gdns librdkafka.gdns
+	cp native/thirdparty/librdkafka/librdkafka.tres librdkafka.tres
+	cp native/thirdparty/librdkafka/bin/osx/librdkafka.dylib librdkafka.dylib
+	cp native/thirdparty/librdkafka/bin/osx/librdkafka.1.dylib librdkafka.1.dylib

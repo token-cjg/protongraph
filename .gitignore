@@ -28,7 +28,9 @@ builds/osx/*.app
 builds/godot.*
 builds/osx/release.dmg
 godot*
-librdkafka.prod.*
+librdkafka.tres
+librdkafka.gdns
+!native/thirdparty/librdkafka/librdkafka.*
 
 *.o
 *.os
