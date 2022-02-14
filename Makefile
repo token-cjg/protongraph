@@ -21,8 +21,9 @@ endef
 
 .PHONY:
 
-#all: mklove-check compile post_compile godot_export package
-all: mklove-check post_compile godot_export package
+all: mklove-check compile copy_compiled_files godot_export package
+
+post_compile: mklove-check copy_compiled_files godot_export package
 
 include mklove/Makefile.base
 
@@ -49,7 +50,7 @@ godot_export:
 compile:
 	pushd native; ./compile_all.sh osx release; popd
 
-post_compile:
+copy_compiled_files:
 	cp native/thirdparty/librdkafka/librdkafka.gdns librdkafka.gdns
 	cp native/thirdparty/librdkafka/librdkafka.tres librdkafka.tres
 	cp native/thirdparty/librdkafka/bin/osx/librdkafka.dylib librdkafka.dylib
