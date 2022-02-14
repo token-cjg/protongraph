@@ -21,8 +21,8 @@ endef
 
 .PHONY:
 
-all: mklove-check compile godot_export package
-#all: mklove-check godot_export package
+#all: mklove-check compile godot_export package
+all: mklove-check godot_export package
 
 include mklove/Makefile.base
 
@@ -35,16 +35,18 @@ package:
 	cp config/kafka.config bin/protongraph.app/Contents/MacOS/config || echo "kafka config not found"
 	cp -rf config/secrets bin/protongraph.app/Contents/MacOS/config || echo "kafka secrets not found"
 	cp build/launch bin/protongraph.app/Contents/MacOS/
-	mkdir -p bin/ProtonGraph.app/Contents/MacOS/native/thirdparty/librdkafka || echo "librdkafka directory already exists"
-	cp native/thirdparty/librdkafka/librdkafka.prod.gdns bin/ProtonGraph.app/Contents/MacOS/native/thirdparty/librdkafka
-	cp native/thirdparty/librdkafka/librdkafka.prod.tres bin/ProtonGraph.app/Contents/MacOS/native/thirdparty/librdkafka
-
+	cp native/thirdparty/librdkafka/librdkafka.prod.gdns bin/ProtonGraph.app/Contents/MacOS/librdkafka.prod.gdns
+	cp native/thirdparty/librdkafka/librdkafka.prod.tres bin/ProtonGraph.app/Contents/MacOS/librdkafka.prod.tres
 	cp native/thirdparty/librdkafka/bin/osx/librdkafka.1.dylib bin/protongraph.app/Contents/MacOS/
 	cp native/thirdparty/librdkafka/bin/osx/librdkafka.dylib bin/protongraph.app/Contents/MacOS/
 	cp native/thirdparty/mesh_optimizer/bin/osx/libmeshoptimizer.dylib bin/protongraph.app/Contents/MacOS/
 
 # Evidently this is currently specific to osx, one presumably would want to generalise this to windows and linux as well.
 godot_export:
+	cp native/thirdparty/librdkafka/librdkafka.prod.gdns librdkafka.prod.gdns
+	cp native/thirdparty/librdkafka/librdkafka.prod.tres librdkafka.prod.tres
+	cp native/thirdparty/librdkafka/bin/osx/librdkafka.dylib librdkafka.dylib
+	cp native/thirdparty/librdkafka/bin/osx/librdkafka.1.dylib librdkafka.1.dylib
 	./$(GODOT_BINARY) --path . --no-window --quiet --export "osx"
 	./extract_app.sh
 
