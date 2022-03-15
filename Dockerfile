@@ -4,7 +4,6 @@ RUN apt-get update && apt-get install libxcursor-dev libxinerama-dev libxrandr-d
 RUN apt-get install xauth -y
 COPY builds/linux /usr/protongraph
 WORKDIR /usr/protongraph
-RUN export DISPLAY=:0.0
 RUN echo 'sleep infinity' >> /bootstrap.sh
 RUN chmod +x /bootstrap.sh
 
