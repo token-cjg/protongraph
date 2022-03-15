@@ -21,14 +21,14 @@ endef
 
 .PHONY:
 
-all: mklove-check compile_osx godot_export_osx package
+all: mklove-check compile_osx godot_export_osx package_osx
 
-docker: mklove-check compile_linux godot_export_linux
+docker: mklove-check compile_linux godot_export_linux package_docker
 
 include mklove/Makefile.base
 
 # nb. this is currently specific to osx. Ideally we should be able to package for linux and windows as well.
-package:
+package_osx:
 	mkdir -p bin/protongraph.app/Contents/MacOS/ || echo "build directory already exists"
 	mkdir -p bin/ProtonGraph.app/Contents/MacOS/config/secrets || echo "secrets directory already exists"
 	rm -r bin/protongraph.app/Contents/MacOS/config/secrets || echo "kafka secrets not found"
@@ -41,6 +41,8 @@ package:
 	cp native/thirdparty/librdkafka/bin/osx/librdkafka.dylib bin/protongraph.app/Contents/MacOS/
 	cp native/thirdparty/mesh_optimizer/bin/osx/libmeshoptimizer.dylib bin/protongraph.app/Contents/MacOS/
 
+package_docker:
+	docker build . -t protongraph
 # Evidently this is currently specific to osx, one presumably would want to generalise this to windows and linux as well.
 godot_export_osx:
 	./$(GODOT_BINARY) --path . --no-window --quiet --export "osx"
