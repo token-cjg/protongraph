@@ -49,7 +49,13 @@ godot_export_osx:
 	./$(GODOT_BINARY) --path . --no-window --quiet --export "osx"
 	./extract_app.sh
 
+# Nb, this presupposes that you are exporting in server-mode (headless) to linux from a custom build of godot (built off tag 3.4.3-stable).
+# To obtain said custom build, you need to run the following commands:
+# #godot> git checkout 3.4.3-stable
+# #godot> scons platform=server tools=yes target=release_debug --jobs=$(sysctl -n hw.logicalcpu)
+# #godot> cp bin/godot_server.osx.opt.tools.64 /<PATH_TO_PROTONGRAPH_ON_YOUR_MACHINE>/protongraph/godot.osx.3.4.3-stable.tools.server.64
 godot_export_linux:
+	pushd ~/.local/share/godot/templates/3.4.3.stable; ln -s ~/Library/Application Support/Godot/templates/3.4.3.stable; popd
 	cp native/thirdparty/librdkafka/bin/x11/librdkafka.so ./
 	cp native/thirdparty/mesh_optimizer/bin/x11/libmeshoptimizer.so ./
 	./$(GODOT_EXPORT_TO_HEADLESS_BINARY) --path . --no-window --quiet --export "linux"
