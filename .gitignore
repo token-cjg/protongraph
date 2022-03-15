@@ -26,6 +26,7 @@ bin/*
 builds/osx/*.app
 builds/godot.*
 builds/osx/release.dmg
+builds/linux/*.*
 godot*
 
 *.o

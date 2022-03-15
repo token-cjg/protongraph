@@ -21,8 +21,9 @@ endef
 
 .PHONY:
 
-# all: mklove-check compile godot_export package
-all: mklove-check package
+all: mklove-check compile_osx godot_export_osx package
+
+docker: mklove-check compile_linux godot_export_linux
 
 include mklove/Makefile.base
 
@@ -41,9 +42,17 @@ package:
 	cp native/thirdparty/mesh_optimizer/bin/osx/libmeshoptimizer.dylib bin/protongraph.app/Contents/MacOS/
 
 # Evidently this is currently specific to osx, one presumably would want to generalise this to windows and linux as well.
-godot_export:
+godot_export_osx:
 	./$(GODOT_BINARY) --path . --no-window --quiet --export "osx"
 	./extract_app.sh
 
-compile:
+godot_export_linux:
+	cp native/thirdparty/librdkafka/bin/x11/librdkafka.so ./
+	cp native/thirdparty/mesh_optimizer/bin/x11/libmeshoptimizer.so ./
+	./$(GODOT_BINARY) --path . --no-window --quiet --export "linux"
+
+compile_osx:
 	pushd native; ./compile_all.sh osx release; popd
+
+compile_linux:
+	pushd native; ./compile_all.sh linux release; popd
