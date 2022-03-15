@@ -14,7 +14,7 @@ MKL_COPYRIGHT_SKIP?=^(tests|packaging)
 OUTPUT= ProtonGraph
 OUTPUT_DMG= builds/osx/release.dmg
 GODOT_BINARY= godot.osx.3.4.2-stable.tools.64
-GODOT_LINUX_HEADLESS_BINARY= godot.linux.3.4.2-stable.headless.64
+GODOT_EXPORT_TO_HEADLESS_BINARY= godot.osx.3.4.3-stable.tools.server.64
 
 define RUN_CMAKE
 	echo $(1) && mkdir $(1)/build && cd $(1)/build && cmake .. && cd -
@@ -52,7 +52,7 @@ godot_export_osx:
 godot_export_linux:
 	cp native/thirdparty/librdkafka/bin/x11/librdkafka.so ./
 	cp native/thirdparty/mesh_optimizer/bin/x11/libmeshoptimizer.so ./
-	./$(GODOT_LINUX_HEADLESS_BINARY) --path . --no-window --quiet --export "linux"
+	./$(GODOT_EXPORT_TO_HEADLESS_BINARY) --path . --no-window --quiet --export "linux"
 
 compile_osx:
 	pushd native; ./compile_all.sh osx release; popd
