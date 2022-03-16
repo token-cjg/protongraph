@@ -58,7 +58,7 @@ godot_export_linux:
 	pushd ~/.local/share/godot/templates/3.4.3.stable; ln -s ~/Library/Application Support/Godot/templates/3.4.3.stable; popd
 	cp native/thirdparty/librdkafka/bin/x11/librdkafka.so ./
 	cp native/thirdparty/mesh_optimizer/bin/x11/libmeshoptimizer.so ./
-	./$(GODOT_EXPORT_TO_HEADLESS_BINARY) --path . --no-window --quiet --export "linux"
+	./$(GODOT_EXPORT_TO_HEADLESS_BINARY) --path . --no-window --display-driver headless --quiet --export "linux"
 
 compile_osx:
 	pushd native; ./compile_all.sh osx release; popd
