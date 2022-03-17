@@ -27,7 +27,7 @@ builds/osx/*.app
 builds/godot.*
 builds/osx/release.dmg
 builds/linux/*.*
-builds/server/*.*
+builds/server/*
 godot*
 
 *.o
