@@ -5,10 +5,19 @@ RUN apt-get -y -o Acquire::ForceIPv4=true update && apt -y -o Acquire::ForceIPv4
 COPY builds/server /usr/protongraph
 # Copy the native resources (basically just compiled Kafka library for now)
 COPY native/thirdparty/librdkafka/librdkafka.gdns /usr/protongraph/native/thirdparty/librdkafka/librdkafka.gdns
+COPY native/thirdparty/librdkafka/librdkafka.tres /usr/protongraph/native/thirdparty/librdkafka/librdkafka.tres
 COPY native/thirdparty/librdkafka/bin/x11/librdkafka.so /usr/protongraph/native/thirdparty/librdkafka/bin/x11/librdkafka.so
 # Copy the hyper-important config files across; without these we can't connect to Kafka
 COPY config /usr/protongraph/config
 WORKDIR /usr/protongraph
 
 # Hack sourced from here to work around X11 requirement: https://github.com/godotengine/godot/issues/18171#issuecomment-383058814
-CMD xvfb-run -a -n 55 -s "-screen 0 1400x900x24 -ac +extension GLX +render -noreset" ./headless
+#CMD xvfb-run -a -n 55 -s "-screen 0 1400x900x24 -ac +extension GLX +render -noreset" ./headless
+
+# ELF utils
+RUN apt-get -y install binutils elfutils
+
+RUN echo 'sleep infinity' >> /bootstrap.sh
+RUN chmod +x /bootstrap.sh
+
+CMD /bootstrap.sh
