@@ -85,7 +85,7 @@ elif env['platform'] in ('x11', 'linux'):
     cpp_library += '.linux'
     #env.Append(LINKFLAGS=['-arch', 'x86_64']) # Important for ELF headers
     #env.Append(LINKFLAGS=["-m64", '-arch', 'x86_64']) # Important for ELF headers
-    env.Append(LINKFLAGS=["-Wl,'$$ORIGIN'", "-m64"]) # Important for ELF headers
+    env.Append(LINKFLAGS=["-Wl", "-m64"]) # Important for ELF headers
     env.Append(CCFLAGS=['-fPIC', '-std=c++17', "-Wwrite-strings"])
     if env['target'] in ('debug', 'd'):
         env.Append(CCFLAGS=['-g3', '-Og'])
