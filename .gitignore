@@ -22,6 +22,7 @@ script_templates/
 .mono/
 # data_*/
 
+# Large files + build artifacts
 bin/*
 builds/osx/*.app
 builds/godot.*
@@ -29,6 +30,7 @@ builds/osx/release.dmg
 builds/linux/*.*
 builds/server/*
 godot*
+templates*
 
 *.o
 *.os

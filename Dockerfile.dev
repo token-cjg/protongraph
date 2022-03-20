@@ -12,7 +12,9 @@ COPY native /usr/protongraph/native
 COPY nodes /usr/protongraph/nodes
 COPY thirdparty /usr/protongraph/thirdparty
 COPY ui /usr/protongraph/ui
-COPY godot.osx.3.4.3-stable.tools.server.64 /usr/protongraph/godot.osx.3.4.3-stable.tools.server.64
+COPY godot.linux.3.4.2-stable.headless.64 /usr/protongraph/godot.linux.3.4.2-stable.headless.64
+RUN mkdir -p ~/.local/share/godot/templates/3.4.2.stable
+COPY templates/3.4.2.stable /usr/protongraph/templates/3.4.2.stable
 
 COPY Makefile /usr/protongraph/Makefile
 
