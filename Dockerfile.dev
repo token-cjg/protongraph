@@ -1,0 +1,34 @@
+FROM ubuntu:20.04
+
+RUN apt-get -y -o Acquire::ForceIPv4=true update
+RUN apt-get install -y make scons g++
+
+COPY addons /usr/protongraph/addons
+COPY common /usr/protongraph/common
+COPY config /usr/protongraph/config
+COPY core /usr/protongraph/core
+COPY mklove /usr/protongraph/mklove
+COPY native /usr/protongraph/native
+COPY nodes /usr/protongraph/nodes
+COPY thirdparty /usr/protongraph/thirdparty
+COPY ui /usr/protongraph/ui
+COPY godot.osx.3.4.3-stable.tools.server.64 /usr/protongraph/godot.osx.3.4.3-stable.tools.server.64
+
+COPY Makefile /usr/protongraph/Makefile
+
+WORKDIR /usr/protongraph
+
+#RUN make compile_linux
+
+RUN echo 'sleep infinity' >> /bootstrap.sh
+RUN chmod +x /bootstrap.sh
+
+CMD /bootstrap.sh
+
+# ELF utils
+# RUN apt-get -y install binutils elfutils
+
+# RUN echo 'sleep infinity' >> /bootstrap.sh
+# RUN chmod +x /bootstrap.sh
+
+# CMD /bootstrap.sh
