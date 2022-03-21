@@ -34,16 +34,10 @@ RUN make compile_linux SHELL=/bin/bash
 RUN make godot_export_linux
 
 # Extract binary from container
+# (if possible ...!)
 
+# For debugging purposes only
 RUN echo 'sleep infinity' >> /bootstrap.sh
 RUN chmod +x /bootstrap.sh
 
 CMD /bootstrap.sh
-
-# ELF utils
-# RUN apt-get -y install binutils elfutils
-
-# RUN echo 'sleep infinity' >> /bootstrap.sh
-# RUN chmod +x /bootstrap.sh
-
-# CMD /bootstrap.sh

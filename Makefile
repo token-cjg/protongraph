@@ -24,8 +24,8 @@ endef
 
 .PHONY:
 
-all: mklove-check compile_osx godot_export_osx package_osx
-
+all: mklove-check compile_linux docker_export_linux package_docker
+osx: mklove-check compile_osx godot_export_osx package_osx
 docker: mklove-check compile_linux godot_export_linux package_docker
 
 include mklove/Makefile.base
