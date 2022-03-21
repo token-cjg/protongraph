@@ -16,4 +16,4 @@ RUN cd templates && cp * ~/.local/share/godot/templates/3.4.2.stable && cd -
 
 # Copy the native resources
 COPY native/thirdparty/librdkafka/librdkafka.gdns librdkafka.gdns
-COPY native/thirdparty/librdkafka/librdkafka.tres librdkafka.tres
+COPY native/thirdparty/librdkafka/librdkafka.tres librdkafka.prod.tres
