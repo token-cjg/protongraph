@@ -15,8 +15,8 @@ MKL_COPYRIGHT_SKIP?=^(tests|packaging)
 OUTPUT= ProtonGraph
 OUTPUT_DMG= builds/osx/release.dmg
 GODOT_BINARY= godot.osx.3.4.2-stable.tools.64
-#GODOT_EXPORT_TO_HEADLESS_BINARY= godot.osx.3.4.3-stable.tools.server.64
-GODOT_EXPORT_TO_HEADLESS_BINARY= godot.linux.3.4.2-stable.headless.64
+GODOT_EXPORT_TO_HEADLESS_BINARY= godot.osx.3.4.3-stable.tools.server.64
+DOCKER_EXPORT_TO_HEADLESS_BINARY= godot.linux.3.4.2-stable.headless.64
 
 define RUN_CMAKE
 	echo $(1) && mkdir $(1)/build && cd $(1)/build && cmake .. && cd -
@@ -57,10 +57,17 @@ godot_export_osx:
 # #godot> scons platform=server tools=yes target=release_debug --jobs=$(sysctl -n hw.logicalcpu)
 # #godot> cp bin/godot_server.osx.opt.tools.64 /<PATH_TO_PROTONGRAPH_ON_YOUR_MACHINE>/protongraph/godot.osx.3.4.3-stable.tools.server.64
 godot_export_linux:
-	pushd ~/.local/share/godot/templates/3.4.3.stable; ln -s ~/Library/Application Support/Godot/templates/3.4.3.stable; popd || echo "godot template not found"
+	pushd ~/.local/share/godot/templates/3.4.3.stable; ln -s ~/Library/Application Support/Godot/templates/3.4.3.stable; popd
 	cp native/thirdparty/librdkafka/bin/x11/librdkafka.so ./
 	cp native/thirdparty/mesh_optimizer/bin/x11/libmeshoptimizer.so ./
 	./$(GODOT_EXPORT_TO_HEADLESS_BINARY) --path . --no-window --display-driver headless --quiet --export "server"
+	mv headless builds/server
+	mv headless.pck builds/server
+
+docker_export_linux:
+	cp native/thirdparty/librdkafka/bin/x11/librdkafka.so ./
+	cp native/thirdparty/mesh_optimizer/bin/x11/libmeshoptimizer.so ./
+	./$(DOCKER_EXPORT_TO_HEADLESS_BINARY) --path . --no-window --display-driver headless --quiet --export "server"
 	mv headless builds/server
 	mv headless.pck builds/server
 
