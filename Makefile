@@ -18,17 +18,22 @@ GODOT_BINARY= godot.osx.3.4.2-stable.tools.64
 GODOT_EXPORT_TO_HEADLESS_BINARY= godot.osx.3.4.3-stable.tools.server.64
 DOCKER_EXPORT_TO_HEADLESS_BINARY= godot.linux.3.4.2-stable.headless.64
 
+LIBRDKAFKA_DIR= native/thirdparty/librdkafka/lib
+
 define RUN_CMAKE
 	echo $(1) && mkdir $(1)/build && cd $(1)/build && cmake .. && cd -
 endef
 
 .PHONY:
 
-all: mklove-check compile_linux docker_export_linux package_docker
+all: mklove-check build_rdkafka compile_linux docker_export_linux package_docker
 osx: mklove-check compile_osx godot_export_osx package_osx
 docker: mklove-check compile_linux godot_export_linux package_docker
 
 include mklove/Makefile.base
+
+build_rdkafka:
+	pushd $(LIBRDKAFKA_DIR); ./configure && make; popd
 
 # nb. this is currently specific to osx. Ideally we should be able to package for linux and windows as well.
 package_osx:

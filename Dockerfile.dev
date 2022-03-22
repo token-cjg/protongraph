@@ -4,6 +4,7 @@ FROM ubuntu:20.04
 RUN apt-get -y -o Acquire::ForceIPv4=true update
 RUN apt-get install -y make scons g++
 RUN apt-get install -y wget unzip vim
+RUN apt-get install -y binutils elfutils patchelf
 
 # Set working directory
 RUN mkdir -p /usr/protongraph
@@ -30,6 +31,7 @@ COPY Makefile /usr/protongraph/Makefile
 
 # Run make commands
 RUN mkdir -p /builds/server
+RUN make build_rdkafka
 RUN make compile_linux SHELL=/bin/bash
 RUN make godot_export_linux
 

@@ -1,6 +1,8 @@
 FROM ubuntu:20.04
 
 RUN apt-get -y -o Acquire::ForceIPv4=true update && apt -y -o Acquire::ForceIPv4=true install xvfb libxcursor-dev libxinerama1 libxrandr2 libxi6 libasound2 libpulse0 libgl1-mesa-glx
+# ELF utils
+RUN apt-get -y install binutils elfutils patchelf
 # Copy the headless binary + pck
 COPY builds/server /usr/protongraph
 # Copy the native resources (basically just compiled Kafka library for now)
@@ -12,12 +14,9 @@ COPY config /usr/protongraph/config
 WORKDIR /usr/protongraph
 
 # Hack sourced from here to work around X11 requirement: https://github.com/godotengine/godot/issues/18171#issuecomment-383058814
-CMD xvfb-run -a -n 55 -s "-screen 0 1400x900x24 -ac +extension GLX +render -noreset" ./headless
+# CMD xvfb-run -a -n 55 -s "-screen 0 1400x900x24 -ac +extension GLX +render -noreset" ./headless
 
-# ELF utils
-# RUN apt-get -y install binutils elfutils
+RUN echo 'sleep infinity' >> /bootstrap.sh
+RUN chmod +x /bootstrap.sh
 
-# RUN echo 'sleep infinity' >> /bootstrap.sh
-# RUN chmod +x /bootstrap.sh
-
-# CMD /bootstrap.sh
+CMD /bootstrap.sh
