@@ -38,7 +38,8 @@ fi
 
 if [ $platform=="linux" ]
   then
-    cp lib/src/librdkafka.so bin/linux/librdkafka.so
+    cp lib/src/librdkafka.1.so bin/x11/librdkafka.so
+    # Likely need to use patchelf here to change the rpath to redirect the relative path of librdkafka.1.so to wherever we are executing the project.
 fi
 
 # Make sure that we add the mesh optimizer.  nb, not sure that this is required any more? https://github.com/godotengine/godot/pull/47764 , https://github.com/protongraph/protongraph/issues/101

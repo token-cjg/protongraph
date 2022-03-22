@@ -38,7 +38,8 @@ opts.Add(PathVariable('target_name', 'The library name.', 'librdkafka', PathVari
 godot_headers_path = "../../godot-cpp/godot_headers/"
 cpp_bindings_path = "../../godot-cpp/"
 cpp_library = "libgodot-cpp"
-rdkafka_library = "librdkafka.dylib"
+rdkafka_library_osx = "librdkafka.dylib"
+rdkafka_library_linux = "librdkafka.so"
 rdkafka_bindings_path = "./lib/src/"
 
 # only support 64 at this time..
@@ -139,7 +140,11 @@ cpp_library += '.' + str(bits)
 # make sure our binding library is properly includes
 env.Append(CPPPATH=['.', godot_headers_path, cpp_bindings_path + 'include/', cpp_bindings_path + 'include/core/', cpp_bindings_path + 'include/gen/'])
 env.Append(LIBPATH=[cpp_bindings_path + 'bin/', rdkafka_bindings_path])
-env.Append(LIBS=[cpp_library, rdkafka_library])
+
+if env['platform'] == 'linux':
+    env.Append(LIBS=[cpp_library, rdkafka_library_linux])
+elif env['platform'] == 'osx':
+    env.Append(LIBS=[cpp_library, rdkafka_library_osx])
 
 # tweak this if you want to use different folders, or more folders, to store your source code in.
 env.Append(CPPPATH=['./'])
