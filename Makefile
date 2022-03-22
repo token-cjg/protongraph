@@ -26,9 +26,12 @@ endef
 
 .PHONY:
 
+# Build within docker container for separate docker process
 all: mklove-check build_rdkafka compile_linux docker_export_linux package_docker
-osx: mklove-check compile_osx godot_export_osx package_osx
-docker: mklove-check compile_linux godot_export_linux package_docker
+# Build on osx for osx
+osx: mklove-check build_rdkafka compile_osx godot_export_osx package_osx
+# Build on osx for docker process
+docker: mklove-check build_rdkafka compile_linux godot_export_linux package_docker
 
 include mklove/Makefile.base
 
