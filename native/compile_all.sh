@@ -30,16 +30,16 @@ scons -j${threads} platform=$platform bits=64 debug_symbols=no target=$target
 # We'll need to repoint a dependency within the dynamic library to point to the relative path to wherever we are
 # executing the project.  At present I have set this relative to the root.  When eventually this is compiled to an
 # osx bundle we'll need to change this to be relative to the root of the bundle.
-if [ $platform=="osx" ]
+if [ $1="osx" ]
   then
     cp lib/src/librdkafka.1.dylib bin/osx/librdkafka.1.dylib
     install_name_tool -change /usr/local/lib/librdkafka.1.dylib @executable_path/native/thirdparty/librdkafka/bin/osx/librdkafka.1.dylib bin/osx/librdkafka.dylib
 fi
 
-if [ $platform=="linux" ]
+if [ $1="linux" ]
   then
-    cp lib/src/librdkafka.1.so bin/x11/librdkafka.so
-    # Likely need to use patchelf here to change the rpath to redirect the relative path of librdkafka.1.so to wherever we are executing the project.
+    cp lib/src/librdkafka.so.1 bin/x11/librdkafka.so
+    # Likely need to use patchelf here to change the rpath to redirect the relative path of librdkafka.so.1 to wherever we are executing the project.
 fi
 
 # Make sure that we add the mesh optimizer.  nb, not sure that this is required any more? https://github.com/godotengine/godot/pull/47764 , https://github.com/protongraph/protongraph/issues/101

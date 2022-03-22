@@ -75,6 +75,8 @@ godot_export_linux:
 docker_export_linux:
 	cp native/thirdparty/librdkafka/bin/x11/librdkafka.so ./
 	cp native/thirdparty/mesh_optimizer/bin/x11/libmeshoptimizer.so ./
+	cp native/thirdparty/librdkafka/librdkafka.gdns librdkafka.gdns
+	cp native/thirdparty/librdkafka/librdkafka.tres librdkafka.prod.tres
 	./$(DOCKER_EXPORT_TO_HEADLESS_BINARY) --path . --no-window --display-driver headless --quiet --export "server"
 	mv headless builds/server
 	mv headless.pck builds/server
