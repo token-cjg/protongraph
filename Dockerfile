@@ -3,6 +3,8 @@ FROM ubuntu:20.04
 RUN apt-get -y -o Acquire::ForceIPv4=true update && apt -y -o Acquire::ForceIPv4=true install xvfb libxcursor-dev libxinerama1 libxrandr2 libxi6 libasound2 libpulse0 libgl1-mesa-glx
 # ELF utils
 RUN apt-get -y install binutils elfutils patchelf
+# Additional utils for runtime execution
+RUN apt-get -y install curl
 # Copy the headless binary + pck
 COPY builds/server /usr/protongraph
 # Copy the native resources (basically just compiled Kafka library for now)
