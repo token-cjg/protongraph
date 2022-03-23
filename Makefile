@@ -78,7 +78,7 @@ docker_export_linux:
 	cp native/thirdparty/mesh_optimizer/bin/x11/libmeshoptimizer.so ./
 	cp native/thirdparty/librdkafka/librdkafka.gdns librdkafka.gdns
 	cp native/thirdparty/librdkafka/librdkafka.tres librdkafka.prod.tres
-	./$(DOCKER_EXPORT_TO_HEADLESS_BINARY) --path . --no-window --display-driver headless --quiet --export "server"
+	./$(DOCKER_EXPORT_TO_HEADLESS_BINARY) --path . --no-window --display-driver headless --audio-driver Dummy --quiet --export "server"
 	mv headless builds/server
 	mv headless.pck builds/server
 
