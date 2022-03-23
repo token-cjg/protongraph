@@ -32,6 +32,9 @@ builds/server/*
 godot*
 templates*
 headless.tmp
+librdkafka.gdns
+librdkafka.prod.gdns
+*/**/librdkafka.so.1
 
 *.o
 *.os

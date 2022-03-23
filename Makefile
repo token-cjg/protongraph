@@ -74,6 +74,7 @@ godot_export_linux:
 
 docker_export_linux:
 	cp native/thirdparty/librdkafka/bin/x11/librdkafka.so ./
+	cp native/thirdparty/librdkafka/bin/x11/librdkafka.so.1 ./
 	cp native/thirdparty/mesh_optimizer/bin/x11/libmeshoptimizer.so ./
 	cp native/thirdparty/librdkafka/librdkafka.gdns librdkafka.gdns
 	cp native/thirdparty/librdkafka/librdkafka.tres librdkafka.prod.tres

@@ -9,6 +9,8 @@ COPY builds/server /usr/protongraph
 COPY native/thirdparty/librdkafka/librdkafka.gdns /usr/protongraph/native/thirdparty/librdkafka/librdkafka.gdns
 COPY native/thirdparty/librdkafka/librdkafka.tres /usr/protongraph/native/thirdparty/librdkafka/librdkafka.tres
 COPY native/thirdparty/librdkafka/bin/x11/librdkafka.so /usr/protongraph/native/thirdparty/librdkafka/bin/x11/librdkafka.so
+COPY native/thirdparty/librdkafka/bin/x11/librdkafka.so.1 /usr/protongraph/native/thirdparty/librdkafka/bin/x11/librdkafka.so.1
+
 # Copy the hyper-important config files across; without these we can't connect to Kafka
 COPY config /usr/protongraph/config
 WORKDIR /usr/protongraph
