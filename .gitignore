@@ -34,7 +34,9 @@ templates*
 headless.tmp
 librdkafka.gdns
 librdkafka.prod.gdns
+librdkafka.prod.tres
 */**/librdkafka.so.1
+librdkafka.so.1
 
 *.o
 *.os
