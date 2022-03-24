@@ -1,5 +1,11 @@
 FROM ubuntu:20.04
 
+# Tooling to support running the programme
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test -y
+RUN apt-get -y -o Acquire::ForceIPv4=true update && apt-get install -y gcc-4.9 && apt-get upgrade -y libstdc++6
+RUN apt-get dist-upgrade -y
+
+# Packages for runtime execution
 RUN apt-get -y -o Acquire::ForceIPv4=true update && apt -y -o Acquire::ForceIPv4=true install xvfb libxcursor-dev libxinerama1 libxrandr2 libxi6 libasound2 libpulse0 libgl1-mesa-glx
 # ELF utils
 RUN apt-get -y install binutils elfutils patchelf

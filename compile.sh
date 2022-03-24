@@ -10,6 +10,6 @@
 # Build the compile image for compilation
 docker build -f Dockerfile.compile . -t gcc-build
 # Run the compile image in order to build the required headless binary
-docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp gcc-build make SHELL=/bin/bash
+docker run --rm -v "$PWD":/usr/protongraph -w /usr/protongraph gcc-build make SHELL=/bin/bash
 # Build the protongraph headless runtime image
 make package_docker
