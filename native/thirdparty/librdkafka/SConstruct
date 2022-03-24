@@ -84,7 +84,7 @@ elif env['platform'] in ('x11', 'linux'):
     env['target_path'] += 'x11/'
     env['target_name'] += '.so'
     cpp_library += '.linux'
-    env.Append(LINKFLAGS=["-Wl", "-m64"]) # Important for ELF headers
+    env.Append(LINKFLAGS=["-Wl,-z,origin", "-m64"]) # Important for ELF headers
     if env['target'] in ('debug', 'd'):
         env.Append(CCFLAGS=['-fPIC', '-std=c++17', "-Wwrite-strings", '-g3', '-Og'])
     else:
