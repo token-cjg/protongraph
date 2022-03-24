@@ -1,8 +1,13 @@
 FROM ubuntu:20.04
 
-# Tooling to support running the programme
+# Alter sources list so that we can find gcc-4.9
+RUN cd /etc/apt && echo 'deb http://dk.archive.ubuntu.com/ubuntu/ xenial main\n' >> sources.list && echo 'deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe\n' >> sources.list && cd -
+
+# Make sure that we have add-apt-repository available
 RUN apt-get -y -o Acquire::ForceIPv4=true update
 RUN apt-get install software-properties-common -y
+
+# Tooling to support running the programme
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test -y
 RUN apt-get -y -o Acquire::ForceIPv4=true update && apt-get install -y gcc-4.9 && apt-get upgrade -y libstdc++6
 RUN apt-get dist-upgrade -y
