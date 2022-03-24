@@ -7,10 +7,12 @@
 #include <fstream>
 #include <sstream>
 #include "./utility.h"
+#include <atomic>
+#include <csignal>
 
 using namespace godot;
 
-static volatile sig_atomic_t run = 1;
+static volatile std::atomic_uint32_t run = 1;
 
 void sigterm(int sig) {
   run = 0;
