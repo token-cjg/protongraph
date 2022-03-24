@@ -39,7 +39,7 @@ fi
 if [ $1="linux" ]
   then
     cp lib/src/librdkafka.so.1 bin/x11/librdkafka.so.1
-    patchelf --set-rpath ${ORIGIN}/native/thirdparty/librdkafka/bin/x11/librdkafka.so.1 bin/x11/librdkafka.so
+    patchelf --set-rpath $ORIGIN/native/thirdparty/librdkafka/bin/x11/librdkafka.so.1 bin/x11/librdkafka.so
 fi
 
 # Make sure that we add the mesh optimizer.  nb, not sure that this is required any more? https://github.com/godotengine/godot/pull/47764 , https://github.com/protongraph/protongraph/issues/101
