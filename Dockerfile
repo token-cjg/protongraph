@@ -1,6 +1,8 @@
 FROM ubuntu:20.04
 
 # Tooling to support running the programme
+RUN apt-get -y -o Acquire::ForceIPv4=true update
+RUN apt-get install software-properties-common -y
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test -y
 RUN apt-get -y -o Acquire::ForceIPv4=true update && apt-get install -y gcc-4.9 && apt-get upgrade -y libstdc++6
 RUN apt-get dist-upgrade -y
