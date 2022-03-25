@@ -11,7 +11,11 @@ var _incoming = {}
 
 
 func _ready() -> void:
-	_ws.set_bind_ip("127.0.0.1")
+	# If we set this to localhost then when running headlessly in docker we can't connect to it
+	# from outside the running container, so leave as default wildcard IP instead.
+	# ref: https://docs.godotengine.org/en/stable/classes/class_websocketserver.html#property-descriptions
+	# ref: https://stackoverflow.com/a/54102318/1979000
+	# _ws.set_bind_ip("127.0.0.1")
 	Signals.safe_connect(_ws, "client_connected", self, "_on_client_connected")
 	Signals.safe_connect(_ws, "client_disconnected", self, "_on_client_disconnected")
 	Signals.safe_connect(_ws, "client_close_request", self, "_on_client_close_request")
@@ -93,6 +97,10 @@ func _on_client_disconnected(id: int, clean_close := false) -> void:
 func _on_data_received(client_id: int) -> void:
 	var packet: PoolByteArray = _ws.get_peer(client_id).get_packet()
 	var string = packet.get_string_from_utf8()
+	# For testing purposes only, remove these lines later.
+	#print("Data received from client ", client_id)
+	#var librdkafka = load("res://native/thirdparty/librdkafka/librdkafka.gdns").new()
+	#librdkafka.produce(packet)
 
 	var json = JSON.parse(string)
 	if json.error != OK:
