@@ -34,5 +34,5 @@ WORKDIR /usr/protongraph
 CMD xvfb-run -a -n 55 -s "-screen 0 1400x900x24 -ac +extension GLX +render -noreset" ./headless --audio-driver Dummy --display-driver headless
 # RUN echo 'sleep infinity' >> /bootstrap.sh
 # RUN chmod +x /bootstrap.sh
-
 # CMD /bootstrap.sh
+EXPOSE 4347
