@@ -1,3 +1,2 @@
 #!/bin/bash
-# nb this script only works after compiling for osx
-./bin/protongraph.app/Contents/MacOS/launch
+docker run --name protongraph -p 4347:4347 protongraph
