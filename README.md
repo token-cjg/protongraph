@@ -52,9 +52,19 @@ Downloading a built version of the Godot binary will not work as the officially 
 
 ### Making the project
 
+To build for Docker, ensure that you have the headless binary for linux, `godot.linux.3.4.2-stable.headless.64`.  You can obtain this from [here](https://downloads.tuxfamily.org/godotengine/3.4.2/), it will be the debug server build.  Note that you will need to rename the binary.
+
+Then run `make`.  After this, `./scripts/start.sh` will start the process, and `./scripts/stop.sh` will stop it.  `./scripts/debug.sh` will provide a prompt inside the running container.
+
+Alternatively if you wish to build for OSX, ensure that you have the binary for osx, `godot.osx.3.4.2-stable.tools.64`, then run `make osx`.  Note that the compiled binary obtained via this approach does not support Kafka at present.
+
+### Further particulars
+
 Protongraph has two modes of operation being Default responder mode, and Kafka producer mode.  Default responder mode responds along the Websocket connection that sync-godot establishes with Protongraph via the Godot engine client.  In this mode, packets are sent back and forth directly between the Godot engine and Protongraph via Websocket.
 
 In Kafka producer mode, Protongraph writes messages it receives via a Websocket connection to a Kafka topic instead.  This mode is useful for instance if Protongraph is deployed to the cloud, and there are up to several additional network hops between the running Godot game and Protongraph, eg Godot game -> Signalling server -> Kafka topic -> Kafka consumer -> Protongraph.  In this instance, the output work from Protongraph would return to the Godot game in potentially a 1 to many relationship via eg Protongraph -> Kafka topic -> Signalling server -> { set of networked clients running the Godot game }.
+
+For more information see `config/Readme.md`.
 
 ## Social medias
 
