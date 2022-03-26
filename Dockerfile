@@ -32,7 +32,4 @@ WORKDIR /usr/protongraph
 
 # Hack sourced from here to work around X11 requirement: https://github.com/godotengine/godot/issues/18171#issuecomment-383058814
 CMD xvfb-run -a -n 55 -s "-screen 0 1400x900x24 -ac +extension GLX +render -noreset" ./headless --audio-driver Dummy --display-driver headless
-# RUN echo 'sleep infinity' >> /bootstrap.sh
-# RUN chmod +x /bootstrap.sh
-# CMD /bootstrap.sh
 EXPOSE 4347
