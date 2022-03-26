@@ -97,10 +97,6 @@ func _on_client_disconnected(id: int, clean_close := false) -> void:
 func _on_data_received(client_id: int) -> void:
 	var packet: PoolByteArray = _ws.get_peer(client_id).get_packet()
 	var string = packet.get_string_from_utf8()
-	# For testing purposes only, remove these lines later.
-	#print("Data received from client ", client_id)
-	#var librdkafka = load("res://native/thirdparty/librdkafka/librdkafka.gdns").new()
-	#librdkafka.produce(packet)
 
 	var json = JSON.parse(string)
 	if json.error != OK:
