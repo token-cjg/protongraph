@@ -49,6 +49,7 @@ package_osx:
 	cp build/launch bin/protongraph.app/Contents/MacOS/
 	cp native/thirdparty/librdkafka/librdkafka.gdns bin/ProtonGraph.app/Contents/MacOS/librdkafka.gdns
 	cp native/thirdparty/librdkafka/librdkafka.tres bin/ProtonGraph.app/Contents/MacOS/librdkafka.tres
+	cp build/Info.plist bin/protongraph.app/Contents/Info.plist
 	cp native/thirdparty/librdkafka/bin/osx/librdkafka.1.dylib bin/protongraph.app/Contents/MacOS/
 	cp native/thirdparty/librdkafka/bin/osx/librdkafka.dylib bin/protongraph.app/Contents/MacOS/
 	cp native/thirdparty/mesh_optimizer/bin/osx/libmeshoptimizer.dylib bin/protongraph.app/Contents/MacOS/

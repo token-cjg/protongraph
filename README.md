@@ -51,7 +51,7 @@ Downloading a built version of the Godot binary will not work as the officially 
 
 To build for Docker, ensure that you have the headless binary for linux, `godot.linux.3.4.2-stable.headless.64`.  You can obtain this from [here](https://downloads.tuxfamily.org/godotengine/3.4.2/), it will be the debug server build.  Note that you will need to rename the binary.
 
-Then run `make`.  After this, `./scripts/start.sh` will start the process, and `./scripts/stop.sh` will stop it.  `./scripts/debug.sh` will provide a prompt inside the running container.
+Then run `./compile.sh` (do not run `make`).  After this, `./scripts/start.sh` will start the process, and `./scripts/stop.sh` will stop it.  `./scripts/debug.sh` will provide a prompt inside the running container.
 
 Alternatively if you wish to build for OSX, ensure that you have the binary for osx, `godot.osx.3.4.2-stable.tools.64`, then run `make osx`.  Note that the compiled binary obtained via this approach does not support Kafka at present.
 
