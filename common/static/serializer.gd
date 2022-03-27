@@ -5,7 +5,7 @@ extends Node
 
 
 var _resources: Array
-var _serialized_resources: Dictionary
+var _serialized_resources: Array
 
 # _node_metadata consists of an array of Dictionaries of the form [ { fence_planks: <fence_planks_node_path> }, { Path: <Path_node_path> }]
 var _node_metadata: Array
@@ -35,7 +35,7 @@ var _serialized_node_metadata: Dictionary
 # }
 func serialize(nodes_with_references: Array) -> Dictionary:
 	var _resources = []
-	var _serialized_resources = {}
+	var _serialized_resources = []
 
 	var result: Dictionary = {
 		"resources": [],
@@ -58,6 +58,8 @@ func deserialize(data: Dictionary) -> Array:
 	# Deserialize resources here?
 
 	for node in data["node"]:
+		print("Deserializing node: " + node["name"])
+		print(node)
 		_node_metadata.append(node.node_path_input)
 		result.append(_deserialize_recursive(node, _resources))
 	return result
