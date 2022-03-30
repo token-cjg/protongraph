@@ -50,7 +50,8 @@ func _on_data_received(id: int , data: Dictionary) -> void:
 # 					pos:[0, 0, 0]
 # 				}
 # 			}, 
-# 			name:Path, 
+# 			name:Path,
+#			node_path_input:{Path:/root/EditorNode/@@592/@@593/@@601/@@603/@@607/@@611/@@612/@@613/@@629/@@630/@@639/@@640/@@6275/@@6109/@@6110/@@6111/@@6112/@@6113/TestProtongraph/Fence/Inputs/Path}
 # 			type:curve_3d
 # 		},
 # 		{
@@ -67,6 +68,7 @@ func _on_data_received(id: int , data: Dictionary) -> void:
 # 						}
 # 					},
 # 					name:fence_planks,
+#					node_path_input:{fence_planks:/root/EditorNode/@@592/@@593/@@601/@@603/@@607/@@611/@@612/@@613/@@629/@@630/@@639/@@640/@@6275/@@6109/@@6110/@@6111/@@6112/@@6113/TestProtongraph/Fence/Inputs/fence_planks/tmpParent/fence_planks}
 # 					type:mesh
 # 				}],
 # 				data: {
@@ -75,6 +77,7 @@ func _on_data_received(id: int , data: Dictionary) -> void:
 # 					}
 # 				},
 # 				name:tmpParent,
+#				node_path_input:{tmpParent:/root/EditorNode/@@592/@@593/@@601/@@603/@@607/@@611/@@612/@@613/@@629/@@630/@@639/@@640/@@6275/@@6109/@@6110/@@6111/@@6112/@@6113/TestProtongraph/Fence/Inputs/fence_planks/tmpParent}
 # 				type:node_3d
 # 			}],
 # 			data: {
@@ -83,6 +86,7 @@ func _on_data_received(id: int , data: Dictionary) -> void:
 # 				}
 # 			},
 # 			name:fence_planks,
+#			node_path_input:{fence_planks:/root/EditorNode/@@592/@@593/@@601/@@603/@@607/@@611/@@612/@@613/@@629/@@630/@@639/@@640/@@6275/@@6109/@@6110/@@6111/@@6112/@@6113/TestProtongraph/Fence/Inputs/fence_planks}
 # 			type:node_3d
 # 		}], 
 # 		resources:[{
@@ -119,7 +123,6 @@ func _on_data_received(id: int , data: Dictionary) -> void:
 # as well as several optional values.
 func _on_remote_build_requested(id, msg: Dictionary) -> void:
 	print("[IPC] Remote build requested")
-	print(msg)
 	if not msg.has("path"):
 		return
 
