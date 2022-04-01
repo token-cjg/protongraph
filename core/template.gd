@@ -44,7 +44,7 @@ var _proxy_nodes := {}
 var _remote_inputs := {}
 var _remote_resources := {}
 var _loaded_template_path: String
-
+var _loaded_template_content: String
 
 func _init() -> void:
 	Signals.safe_connect(self, "thread_completed", self, "_on_thread_completed")
@@ -62,35 +62,17 @@ func _exit_tree() -> void:
 	if _thread and _thread.is_active():
 		_thread.wait_to_finish()
 
-
-# Opens a pgraph file, reads its contents and recreate a node graph from there
-func load_from_file(path: String, soft_load := false) -> void:
-	if not path or path == "":
-		return
-
-	paused = true
-	_template_loaded = false
-	_loaded_template_path = path
-
-	if soft_load:	# Don't clear, simply refresh the graph edit UI without running the sim
-		clear_editor()
-	else:
-		clear()
-
-	# Open the file and read the contents
-	var file = File.new()
-	file.open(path, File.READ)
-	var json = JSON.parse(file.get_as_text())
+func process_tpgn(json: Dictionary) -> void:
 	if not json or not json.result:
-		print("Failed to parse the template file")
-		return	# Template file is either empty or not a valid Json. Ignore
+		print("Failed to parse the template content")
+		return	# Template content is either empty or not a valid Json. Ignore
 
-	# Abort if the file doesn't have node data
+	# Abort if the template content doesn't have node data
 	var graph: Dictionary = DictUtil.fix_types(json.result)
 	if not graph.has("nodes"):
 		return
 
-	# For each node found in the template file
+	# For each node found in the template content
 	for node_data in graph["nodes"]:
 		if node_data.has("type"):
 			var type = node_data["type"]
@@ -127,6 +109,41 @@ func load_from_file(path: String, soft_load := false) -> void:
 	_template_loaded = true
 	paused = false
 	emit_signal("template_loaded")
+
+func load_from_tpgn(tpgn: String, soft_load := false) -> void:
+	if not tpgn or tpgn == "":
+		return
+	paused = true
+	_template_loaded = false
+	_loaded_template_content = tpgn
+
+	if soft_load:	# Don't clear, simply refresh the graph edit UI without running the sim
+		clear_editor()
+	else:
+		clear()
+
+	var json: Dictionary = JSON.parse(tpgn)
+	process_tpgn(json)
+
+# Opens a pgraph file, reads its contents and recreate a node graph from there
+func load_from_file(path: String, soft_load := false) -> void:
+	if not path or path == "":
+		return
+
+	paused = true
+	_template_loaded = false
+	_loaded_template_path = path
+
+	if soft_load:	# Don't clear, simply refresh the graph edit UI without running the sim
+		clear_editor()
+	else:
+		clear()
+
+	# Open the file and read the contents
+	var file = File.new()
+	file.open(path, File.READ)
+	var json = JSON.parse(file.get_as_text())
+	process_tpgn(json)
 	GlobalEventBus.dispatch("template_loaded", path)
 
 
@@ -193,6 +210,7 @@ func create_node(type: String, data := {}, notify := true) -> ProtonNode:
 
 	new_node.thread_pool = _thread_pool
 	new_node.template_path = _loaded_template_path
+	new_node.template_content = _loaded_template_content
 
 	if data.has("offset"):
 		new_node.offset = data["offset"]
@@ -360,6 +378,8 @@ func get_remote_output() -> Array:
 func get_template_path() -> String:
 	return _loaded_template_path
 
+func get_template_content() -> String:
+	return _loaded_template_content
 
 func get_remote_input(name: String):
 	if name in _remote_inputs:
