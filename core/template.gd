@@ -210,7 +210,6 @@ func create_node(type: String, data := {}, notify := true) -> ProtonNode:
 
 	new_node.thread_pool = _thread_pool
 	new_node.template_path = _loaded_template_path
-	new_node.template_content = _loaded_template_content
 
 	if data.has("offset"):
 		new_node.offset = data["offset"]

@@ -125,7 +125,8 @@ func _on_remote_build_requested(id, msg: Dictionary) -> void:
 	print("[IPC] Remote build requested")
 	var path: String
 	var tpgn: String
-	if not msg.has("path") or not msg.has("tpgn"):
+	if not msg.has("path") and not msg.has("tpgn"):
+		print("[IPC] Remote build requested, but missing path and tpgn")
 		return
 	if msg.has("tpgn"):
 		tpgn = msg["tpgn"]
