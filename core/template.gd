@@ -62,13 +62,13 @@ func _exit_tree() -> void:
 	if _thread and _thread.is_active():
 		_thread.wait_to_finish()
 
-func process_tpgn(json: Dictionary) -> void:
-	if not json or not json.result:
+func process_tpgn(jsonParseResult: JSONParseResult) -> void:
+	if not jsonParseResult or not jsonParseResult.result:
 		print("Failed to parse the template content")
 		return	# Template content is either empty or not a valid Json. Ignore
 
 	# Abort if the template content doesn't have node data
-	var graph: Dictionary = DictUtil.fix_types(json.result)
+	var graph: Dictionary = DictUtil.fix_types(jsonParseResult.result)
 	if not graph.has("nodes"):
 		return
 
@@ -122,8 +122,8 @@ func load_from_tpgn(tpgn: String, soft_load := false) -> void:
 	else:
 		clear()
 
-	var json: Dictionary = JSON.parse(tpgn)
-	process_tpgn(json)
+	var jsonParseResult: JSONParseResult = JSON.parse(tpgn)
+	process_tpgn(jsonParseResult)
 
 # Opens a pgraph file, reads its contents and recreate a node graph from there
 func load_from_file(path: String, soft_load := false) -> void:

@@ -123,13 +123,16 @@ func _on_data_received(id: int , data: Dictionary) -> void:
 # as well as several optional values.
 func _on_remote_build_requested(id, msg: Dictionary) -> void:
 	print("[IPC] Remote build requested")
-	var path: String, tpgn: String
+	var path: String
+	var tpgn: String
 	if not msg.has("path") or not msg.has("tpgn"):
 		return
 	if msg.has("tpgn"):
-		tpgn, path = msg["tpgn"], ""
+		tpgn = msg["tpgn"]
+		path = ""
 	elif msg.has("path"):
-		path, tpgn = msg["path"], ""
+		path = msg["path"]
+		tpgn = ""
 	var inspector: Array = msg["inspector"] if msg.has("inspector") else null
 	var generator_payload_data_array := []
 	var generator_resources_data_array := []
