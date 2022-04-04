@@ -110,6 +110,11 @@ func _on_data_received(client_id: int) -> void:
 
 	var data = DictUtil.fix_types(json.result)
 
+	if (data.has("instanceServiceId")):
+		# Information is from Kafka, so bypass the default responder logic
+		emit_signal("data_received", client_id, data)
+		return
+	
 	var id = int(data[0])
 	var chunk_id = int(data[1])
 	var total_chunks = int(data[2])

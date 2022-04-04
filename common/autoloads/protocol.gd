@@ -24,8 +24,7 @@ func _start_server() -> void:
 
 	_server.start()
 
-
-func _on_data_received(id: int , data: Dictionary) -> void:
+func handle_on_data_received_local(id: int, data: Dictionary) -> void:
 	if not data.has("command"):
 		return
 
@@ -33,10 +32,23 @@ func _on_data_received(id: int , data: Dictionary) -> void:
 		"build":
 			_on_remote_build_requested(id, data)
 
-# See doc/payload.md for an example format of the payload
-func _on_remote_build_requested(id, msg: Dictionary) -> void:
-	print("[IPC] Remote build requested")
-	print(msg)
+
+func handle_on_data_received_kafka(id: int, data: Dictionary) -> void:
+	if not data["message"].has("command"):
+		return
+	
+	match data["message"]["command"]:
+		"build":
+			_on_remote_build_requested(id, data)
+
+func _on_data_received(id: int , data: Dictionary) -> void:
+	if data.has("instanceServiceId") and data.has("message"):
+		handle_on_data_received_kafka(id, data)
+	else:
+		handle_on_data_received_local(id, data)
+
+
+func handle_request_default_responder_mode(id: int, msg: Dictionary, instanceServiceId: int, metadata: Dictionary) -> void:
 	var path: String
 	var tpgn: String
 	if not msg.has("path") and not msg.has("tpgn"):
@@ -58,9 +70,37 @@ func _on_remote_build_requested(id, msg: Dictionary) -> void:
 	var args := {
 		"inspector": inspector,
 		"generator_payload_data_array": generator_payload_data_array,
-		"generator_resources_data_array": generator_resources_data_array
+		"generator_resources_data_array": generator_resources_data_array,
+		"instanceServiceId": instanceServiceId,
+		"metadata": metadata
 	}
 	GlobalEventBus.dispatch("build_for_remote", [id, path, tpgn, args])
+
+func handle_request_kafka_responder_mode(id: int, msg: Dictionary):
+	if not msg.has("message"):
+		print("[IPC] Remote build requested via Kafka, but missing message")
+		return
+	if not msg.has("instanceServiceId"):
+		print("[IPC] Remote build requested via Kafka, but missing instanceServiceId")
+		return
+	if not msg.has("metadata"):
+		print("[IPC] Remote build requested via Kafka, but missing metadata")
+		return
+	var message: Dictionary = msg["message"]
+	handle_request_default_responder_mode(id, message, msg["instanceServiceId"], msg["metadata"])
+
+# See doc/payload.md for an example format of the payload
+func _on_remote_build_requested(id, msg: Dictionary) -> void:
+	print("[IPC] Remote build requested")
+	# print(msg)
+
+	if msg.has("instanceServiceId"):
+		handle_request_kafka_responder_mode(id, msg)
+	else:
+		# There is no instance, so pass -1 as the instanceServiceId
+		# There is also no metadata, so pass an empty dictionary
+		handle_request_default_responder_mode(id, msg, -1, {})
+		
 
 
 func _on_remote_build_completed(id, data: Array) -> void:
