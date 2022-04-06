@@ -102,23 +102,27 @@ func _on_data_received(client_id: int) -> void:
 	#var librdkafka = load("res://native/thirdparty/librdkafka/librdkafka.gdns").new()
 	#librdkafka.produce(packet)
 
-	var json = JSON.parse(string)
-	if json.error != OK:
+	var jsonParseResult = JSON.parse(string)
+	if jsonParseResult.error != OK:
 		print("Data was not a valid json object")
-		print("error ", json.error, " ", json.error_string, " at ", json.error_line)
+		print("error ", jsonParseResult.error, " ", jsonParseResult.error_string, " at ", jsonParseResult.error_line)
 		return
 
-	var data = DictUtil.fix_types(json.result)
+	# print("in _on_data_received")
+	# print(jsonParseResult.result)
+	var data = DictUtil.fix_types(jsonParseResult.result)
+	# print("printing data")
+	# print(data)
 
 	if (data.has("instanceServiceId")):
 		# Information is from Kafka, so bypass the default responder logic
 		emit_signal("data_received", client_id, data)
 		return
 	
-	var id = int(data[0])
-	var chunk_id = int(data[1])
-	var total_chunks = int(data[2])
-	var chunk = data[3]
+	var id = int(data["packet_id"])
+	var chunk_id = int(data["chunk_id"])
+	var total_chunks = int(data["total_chunks"])
+	var chunk = data["chunk"]
 
 	if not id in _incoming:
 		_incoming[id] = {}

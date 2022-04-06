@@ -74,6 +74,8 @@ func handle_request_default_responder_mode(id: int, msg: Dictionary, instanceSer
 		"instanceServiceId": instanceServiceId,
 		"metadata": metadata
 	}
+	# print("now hereee")
+	# print(args)
 	GlobalEventBus.dispatch("build_for_remote", [id, path, tpgn, args])
 
 func handle_request_kafka_responder_mode(id: int, msg: Dictionary):
