@@ -119,9 +119,9 @@ func _on_data_received(client_id: int) -> void:
 		emit_signal("data_received", client_id, data)
 		return
 	
-	var id = int(data["packet_id"])
-	var chunk_id = int(data["chunk_id"])
-	var total_chunks = int(data["total_chunks"])
+	var id = int(data["packetId"])
+	var chunk_id = int(data["chunkId"])
+	var total_chunks = int(data["totalChunks"])
 	var chunk = data["chunk"]
 
 	if not id in _incoming:
