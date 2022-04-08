@@ -73,8 +73,6 @@ func handle_request_default_responder_mode(id: int, msg: Dictionary, metadata: D
 		"generator_resources_data_array": generator_resources_data_array,
 		"metadata": metadata
 	}
-	# print("now hereee")
-	# print(args)
 	GlobalEventBus.dispatch("build_for_remote", [id, path, tpgn, args])
 
 func handle_request_kafka_responder_mode(id: int, msg: Dictionary):
@@ -85,7 +83,8 @@ func handle_request_kafka_responder_mode(id: int, msg: Dictionary):
 		print("[IPC] Remote build requested via Kafka, but missing metadata")
 		return
 	var message: Dictionary = msg["message"]
-	handle_request_default_responder_mode(id, message, msg["metadata"])
+	var metadata: Dictionary = msg["metadata"]
+	handle_request_default_responder_mode(id, message, metadata)
 
 # See doc/payload.md for an example format of the payload
 func _on_remote_build_requested(id, msg: Dictionary) -> void:
@@ -115,6 +114,8 @@ func _on_remote_build_completed(id, data: Array) -> void:
 	# and be moved there during the Make process.
 	if librdkafka.has_config():
 		print("Kafka config found, producing to specified topic on Kafka broker.")
+		print(data)
+		print(msg)
 		librdkafka.produce(msg)
 	else:
 		print("Kafka config not found, falling back to default responder mode.")

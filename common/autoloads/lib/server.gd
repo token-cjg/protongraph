@@ -159,7 +159,8 @@ func _decode(packet_id: int, client_id: int) -> void:
 		return
 
 	var data = DictUtil.fix_types(json.result)
-	data["metadata"] = _incoming[packet_id]["metadata"]
+	if _incoming[packet_id].has("metadata"):
+		data["metadata"] = _incoming[packet_id]["metadata"]
 	emit_signal("data_received", client_id, data)
 
 
