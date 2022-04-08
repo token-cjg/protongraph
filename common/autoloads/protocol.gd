@@ -34,21 +34,21 @@ func handle_on_data_received_local(id: int, data: Dictionary) -> void:
 
 
 func handle_on_data_received_kafka(id: int, data: Dictionary) -> void:
-	if not data["message"].has("command"):
+	if not data["metadata"].has("command"):
 		return
 	
-	match data["message"]["command"]:
+	match data["metadata"]["command"]:
 		"build":
 			_on_remote_build_requested(id, data)
 
 func _on_data_received(id: int , data: Dictionary) -> void:
-	if data.has("instanceServiceId") and data.has("message"):
+	if data.has("metadata"):
 		handle_on_data_received_kafka(id, data)
 	else:
 		handle_on_data_received_local(id, data)
 
 
-func handle_request_default_responder_mode(id: int, msg: Dictionary, instanceServiceId: int, metadata: Dictionary) -> void:
+func handle_request_default_responder_mode(id: int, msg: Dictionary, metadata: Dictionary) -> void:
 	var path: String
 	var tpgn: String
 	if not msg.has("path") and not msg.has("tpgn"):
@@ -71,7 +71,6 @@ func handle_request_default_responder_mode(id: int, msg: Dictionary, instanceSer
 		"inspector": inspector,
 		"generator_payload_data_array": generator_payload_data_array,
 		"generator_resources_data_array": generator_resources_data_array,
-		"instanceServiceId": instanceServiceId,
 		"metadata": metadata
 	}
 	# print("now hereee")
@@ -82,21 +81,18 @@ func handle_request_kafka_responder_mode(id: int, msg: Dictionary):
 	if not msg.has("message"):
 		print("[IPC] Remote build requested via Kafka, but missing message")
 		return
-	if not msg.has("instanceServiceId"):
-		print("[IPC] Remote build requested via Kafka, but missing instanceServiceId")
-		return
 	if not msg.has("metadata"):
 		print("[IPC] Remote build requested via Kafka, but missing metadata")
 		return
 	var message: Dictionary = msg["message"]
-	handle_request_default_responder_mode(id, message, msg["instanceServiceId"], msg["metadata"])
+	handle_request_default_responder_mode(id, message, msg["metadata"])
 
 # See doc/payload.md for an example format of the payload
 func _on_remote_build_requested(id, msg: Dictionary) -> void:
 	print("[IPC] Remote build requested")
 	# print(msg)
 
-	if msg.has("instanceServiceId"):
+	if msg.has("metadata"):
 		handle_request_kafka_responder_mode(id, msg)
 	else:
 		# There is no instance, so pass -1 as the instanceServiceId
