@@ -126,18 +126,15 @@ func _on_data_received(client_id: int) -> void:
 	# Decode once we've received all the chunks
 	if _incoming[packet_id].size() == total_chunks:
 		print("Received all chunks for packet ", packet_id)
-		var command: String
 		var instanceServiceId: int
 		var instanceId: String
 		var peerId: String
 		if data.has("instanceServiceId"):
 			print("Request is from Kafka so attaching metadata.")
-			command = data["command"]
 			instanceServiceId = data["instanceServiceId"]
 			instanceId = data["instanceId"]
 			peerId = data["peerId"]
 			_incoming[packet_id]["metadata"] = {
-				"command": command,
 				"instanceServiceId": instanceServiceId,
 				"instanceId": instanceId,
 				"peerId": peerId

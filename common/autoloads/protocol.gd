@@ -34,10 +34,10 @@ func handle_on_data_received_local(id: int, data: Dictionary) -> void:
 
 
 func handle_on_data_received_kafka(id: int, data: Dictionary) -> void:
-	if not data["metadata"].has("command"):
+	if not data["message"].has("command"):
 		return
 	
-	match data["metadata"]["command"]:
+	match data["message"]["command"]:
 		"build":
 			_on_remote_build_requested(id, data)
 
