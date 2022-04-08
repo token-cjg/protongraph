@@ -114,7 +114,6 @@ func _on_remote_build_completed(id, data: Array) -> void:
 	# and be moved there during the Make process.
 	if librdkafka.has_config():
 		print("Kafka config found, producing to specified topic on Kafka broker.")
-		print(data)
 		print(msg)
 		librdkafka.produce(msg)
 	else:
