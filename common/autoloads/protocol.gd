@@ -97,7 +97,7 @@ func _on_remote_build_requested(id, msg: Dictionary) -> void:
 	else:
 		# There is no instance, so pass -1 as the instanceServiceId
 		# There is also no metadata, so pass an empty dictionary
-		handle_request_default_responder_mode(id, msg, -1, {})
+		handle_request_default_responder_mode(id, msg, {})
 		
 
 
