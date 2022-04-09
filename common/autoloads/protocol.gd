@@ -89,7 +89,6 @@ func handle_request_kafka_responder_mode(id: int, msg: Dictionary):
 # See doc/payload.md for an example format of the payload
 func _on_remote_build_requested(id, msg: Dictionary) -> void:
 	print("[IPC] Remote build requested")
-	# print(msg)
 
 	if msg.has("metadata"):
 		handle_request_kafka_responder_mode(id, msg)
@@ -100,9 +99,10 @@ func _on_remote_build_requested(id, msg: Dictionary) -> void:
 		
 
 
-func _on_remote_build_completed(id, data: Array) -> void:
+func _on_remote_build_completed(id, data: Array, metadata: Dictionary) -> void:
 	var msg = {"type": "build_completed"}
 	msg["data"] = _node_serializer.serialize(data)
+	msg["metadata"] = metadata
 	# Based on whether Protongraph is operating in Kafka mode or not,
 	# either respond to the request via the WebSocket / IPC Server connection or
 	# produce a message on the configured Kafka topic.
@@ -114,7 +114,26 @@ func _on_remote_build_completed(id, data: Array) -> void:
 	# and be moved there during the Make process.
 	if librdkafka.has_config():
 		print("Kafka config found, producing to specified topic on Kafka broker.")
-		librdkafka.produce(msg)
+		var preparedMessage = prepare_kafka_message(msg)
+		librdkafka.produce(preparedMessage)
 	else:
 		print("Kafka config not found, falling back to default responder mode.")
 		_server.send(id, msg)
+
+# We model the way our signalling server on the other side of the Kafka divide expects messages to be as follows:
+# "<messageType>: <peerId>|<instanceUlid>\n<messageData>"
+# where <messageType> is the type of message, <peerId> is the peerId of the peer that originally sent
+# the request for the build, and <instanceUlid> is the instanceUlid of the overarching instance
+# within which the procedurally generated data will ultimately be rendered.
+# <messageData> is the data of the message.
+#
+# Here we emit a messageType of "protongraph_" followed by the Protongraph messageType for when the 
+# application is running in the default responder mode.
+# In most circumstances this will be "protongraph_build_completed"
+func prepare_kafka_message(msg: Dictionary) -> String:
+	var messageType: String = "protongraph_" + msg["type"]
+	var peerId: String = msg["metadata"]["peerId"]
+	var instanceUlid: String = msg["metadata"]["instanceId"]
+	var messageData: String = JSON.print(msg["data"])
+	var message: String = messageType + ": " + peerId + "|" + instanceUlid + "\n" + messageData
+	return message
