@@ -80,7 +80,7 @@ func _on_build_requested(id: int, path: String, tpgn: String, args: Dictionary) 
 	GlobalEventBus.dispatch("remote_build_started", [id])
 	tpl.generate(true)
 	yield(tpl, "build_completed")
-	GlobalEventBus.dispatch("remote_build_completed", [id, tpl.get_remote_output()])
+	GlobalEventBus.dispatch("remote_build_completed", [id, tpl.get_remote_output(), args["metadata"]])
 
 
 # Refresh the loaded templates if they were modified
