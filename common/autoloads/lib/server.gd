@@ -7,7 +7,7 @@ signal data_received
 
 var _ws := WebSocketServer.new()
 var _port := -1
-var _incoming = {}
+var _incoming = {} # nb this should probably be replaced by a database lookup
 
 
 func _ready() -> void:
@@ -102,34 +102,55 @@ func _on_data_received(client_id: int) -> void:
 	#var librdkafka = load("res://native/thirdparty/librdkafka/librdkafka.gdns").new()
 	#librdkafka.produce(packet)
 
-	var json = JSON.parse(string)
-	if json.error != OK:
+	var jsonParseResult = JSON.parse(string)
+	if jsonParseResult.error != OK:
 		print("Data was not a valid json object")
-		print("error ", json.error, " ", json.error_string, " at ", json.error_line)
+		print("error ", jsonParseResult.error, " ", jsonParseResult.error_string, " at ", jsonParseResult.error_line)
 		return
 
-	var data = DictUtil.fix_types(json.result)
+	# print("in _on_data_received")
+	# print(jsonParseResult.result)
+	var data = DictUtil.fix_types(jsonParseResult.result)
+	# print("printing data")
+	# print(data)
+	
+	var packet_id = int(data["packetId"])
+	var chunk_id = int(data["chunkId"])
+	var total_chunks = int(data["totalChunks"])
+	var chunk: String = data["chunk"]
 
-	var id = int(data[0])
-	var chunk_id = int(data[1])
-	var total_chunks = int(data[2])
-	var chunk = data[3]
+	if not packet_id in _incoming:
+		_incoming[packet_id] = {}
 
-	if not id in _incoming:
-		_incoming[id] = {}
+	_incoming[packet_id][chunk_id] = chunk
+	# Decode once we've received all the chunks
+	if _incoming[packet_id].size() == total_chunks:
+		print("Received all chunks for packet ", packet_id)
+		var instanceServiceId: int
+		var instanceId: String
+		var peerId: String
+		if data.has("instanceServiceId"):
+			print("Request is from Kafka so attaching metadata.")
+			instanceServiceId = data["instanceServiceId"]
+			instanceId = data["instanceId"]
+			peerId = data["peerId"]
+			_incoming[packet_id]["metadata"] = {
+				"instanceServiceId": instanceServiceId,
+				"instanceId": instanceId,
+				"peerId": peerId
+			}
+		_decode(packet_id, client_id)
 
-	_incoming[id][chunk_id] = chunk
-	if _incoming[id].size() == total_chunks:
-		_decode(id, client_id)
 
-
-func _decode(id: int, client_id: int) -> void:
-	var keys: Array = _incoming[id].keys()
+func _decode(packet_id: int, client_id: int) -> void:
+	var keys: Array = _incoming[packet_id].keys()
 	keys.sort()
 
 	var string = ""
 	for chunk_id in keys:
-		string += _incoming[id][chunk_id]
+		if str(chunk_id) == "metadata":
+			continue
+		string += _incoming[packet_id][chunk_id]
 
 	var json = JSON.parse(string)
 	if json.error != OK:
@@ -138,6 +159,8 @@ func _decode(id: int, client_id: int) -> void:
 		return
 
 	var data = DictUtil.fix_types(json.result)
+	if _incoming[packet_id].has("metadata"):
+		data["metadata"] = _incoming[packet_id]["metadata"]
 	emit_signal("data_received", client_id, data)
 
 

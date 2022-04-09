@@ -106,7 +106,8 @@ func _deserialize_recursive(data: Dictionary, resource_parent: Array) -> Node:
 		"node_3d":
 			node = _deserialize_node_3d(data["data"])
 		"mesh":
-			resource["resource_path"] = data["data"]["resource_path"]
+			if data["data"].has("resource_path"):
+				resource["resource_path"] = data["data"]["resource_path"]
 			node = _deserialize_mesh_instance(data["data"])
 		"multi_mesh":
 			node = _deserialize_multi_mesh(data["data"])
