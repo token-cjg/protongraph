@@ -103,6 +103,7 @@ func _on_remote_build_completed(id, data: Array, metadata: Dictionary) -> void:
 	var msg = {"type": "build_completed"}
 	msg["data"] = _node_serializer.serialize(data)
 	msg["metadata"] = metadata
+	msg["origin"] = "protongraph" # Used by the Signalling server to identify where the message came from, be that "client", "protongraph", or otherwise.
 	# Based on whether Protongraph is operating in Kafka mode or not,
 	# either respond to the request via the WebSocket / IPC Server connection or
 	# produce a message on the configured Kafka topic.
@@ -134,6 +135,6 @@ func prepare_kafka_message(msg: Dictionary) -> String:
 	var messageType: String = "protongraph_" + msg["type"]
 	var peerId: String = msg["metadata"]["peerId"]
 	var instanceUlid: String = msg["metadata"]["instanceId"]
-	var messageData: String = JSON.print(msg["data"])
+	var messageData: String = JSON.print(msg)
 	var message: String = messageType + ": " + peerId + "|" + instanceUlid + "\n" + messageData
 	return message
