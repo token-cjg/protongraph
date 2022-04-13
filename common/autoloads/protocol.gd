@@ -133,8 +133,8 @@ func _on_remote_build_completed(id, data: Array, metadata: Dictionary) -> void:
 # In most circumstances this will be "protongraph_build_completed"
 func prepare_kafka_message(msg: Dictionary) -> String:
 	var messageType: String = "protongraph_" + msg["type"]
-	var peerId: String = msg["metadata"]["peerId"]
+	var peerKey: String = msg["metadata"]["peerKey"]
 	var instanceUlid: String = msg["metadata"]["instanceId"]
 	var messageData: String = JSON.print(msg)
-	var message: String = messageType + ": " + peerId + "|" + instanceUlid + "\n" + messageData
+	var message: String = messageType + ": " + peerKey + "|" + instanceUlid + "\n" + messageData
 	return message
