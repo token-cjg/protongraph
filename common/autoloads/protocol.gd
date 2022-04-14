@@ -103,6 +103,7 @@ func _on_remote_build_completed(id, data: Array, metadata: Dictionary) -> void:
 	var msg = {"type": "build_completed"}
 	msg["data"] = _node_serializer.serialize(data)
 	msg["metadata"] = metadata
+	msg["origin"] = "protongraph" # Used by the Signalling server to identify where the message came from, be that "client", "protongraph", or otherwise.
 	# Based on whether Protongraph is operating in Kafka mode or not,
 	# either respond to the request via the WebSocket / IPC Server connection or
 	# produce a message on the configured Kafka topic.
@@ -121,9 +122,9 @@ func _on_remote_build_completed(id, data: Array, metadata: Dictionary) -> void:
 		_server.send(id, msg)
 
 # We model the way our signalling server on the other side of the Kafka divide expects messages to be as follows:
-# "<messageType>: <peerId>|<instanceUlid>\n<messageData>"
-# where <messageType> is the type of message, <peerId> is the peerId of the peer that originally sent
-# the request for the build, and <instanceUlid> is the instanceUlid of the overarching instance
+# "<messageType>: <peerKey>|<instanceUlid>\n<messageData>"
+# where <messageType> is the type of message, <peerKey> is the peerKey of the peer that originally sent
+# the request for the build (and is a Ulid), and <instanceUlid> is the instanceUlid of the overarching instance
 # within which the procedurally generated data will ultimately be rendered.
 # <messageData> is the data of the message.
 #
@@ -132,8 +133,8 @@ func _on_remote_build_completed(id, data: Array, metadata: Dictionary) -> void:
 # In most circumstances this will be "protongraph_build_completed"
 func prepare_kafka_message(msg: Dictionary) -> String:
 	var messageType: String = "protongraph_" + msg["type"]
-	var peerId: String = msg["metadata"]["peerId"]
+	var peerKey: String = msg["metadata"]["peerKey"]
 	var instanceUlid: String = msg["metadata"]["instanceId"]
-	var messageData: String = JSON.print(msg["data"])
-	var message: String = messageType + ": " + peerId + "|" + instanceUlid + "\n" + messageData
+	var messageData: String = JSON.print(msg)
+	var message: String = messageType + ": " + peerKey + "|" + instanceUlid + "\n" + messageData
 	return message
