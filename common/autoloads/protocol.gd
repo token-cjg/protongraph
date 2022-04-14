@@ -122,9 +122,9 @@ func _on_remote_build_completed(id, data: Array, metadata: Dictionary) -> void:
 		_server.send(id, msg)
 
 # We model the way our signalling server on the other side of the Kafka divide expects messages to be as follows:
-# "<messageType>: <peerId>|<instanceUlid>\n<messageData>"
-# where <messageType> is the type of message, <peerId> is the peerId of the peer that originally sent
-# the request for the build, and <instanceUlid> is the instanceUlid of the overarching instance
+# "<messageType>: <peerKey>|<instanceUlid>\n<messageData>"
+# where <messageType> is the type of message, <peerKey> is the peerKey of the peer that originally sent
+# the request for the build (and is a Ulid), and <instanceUlid> is the instanceUlid of the overarching instance
 # within which the procedurally generated data will ultimately be rendered.
 # <messageData> is the data of the message.
 #
