@@ -95,7 +95,7 @@ func _on_client_disconnected(id: int, clean_close := false) -> void:
 
 
 func _on_data_received(client_id: int) -> void:
-	print("Data received from client ", client_id)
+	# print("Data received from client ", client_id)
 	var packet: PoolByteArray = _ws.get_peer(client_id).get_packet()
 	var string = packet.get_string_from_utf8()
 	# For testing purposes only, remove these lines later.
@@ -112,8 +112,8 @@ func _on_data_received(client_id: int) -> void:
 	# print("in _on_data_received")
 	# print(jsonParseResult.result)
 	var data = DictUtil.fix_types(jsonParseResult.result)
-	print("printing data")
-	print(data)
+	# print("printing data")
+	# print(data)
 	
 	var packet_id = int(data["packetId"])
 	var chunk_id = int(data["chunkId"])
@@ -126,7 +126,7 @@ func _on_data_received(client_id: int) -> void:
 	_incoming[packet_id][chunk_id] = chunk
 	# Decode once we've received all the chunks
 	if _incoming[packet_id].size() == total_chunks:
-		print("Received all chunks for packet ", packet_id)
+		# print("Received all chunks for packet ", packet_id)
 		_ws.disconnect_peer(
 			client_id,
 			1000,
