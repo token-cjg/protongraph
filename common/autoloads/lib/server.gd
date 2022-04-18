@@ -127,7 +127,11 @@ func _on_data_received(client_id: int) -> void:
 	# Decode once we've received all the chunks
 	if _incoming[packet_id].size() == total_chunks:
 		print("Received all chunks for packet ", packet_id)
-		_ws.start() # Restart the server to receive more data and also notify the provider that the message has been received.
+		_ws.disconnect_peer(
+			client_id,
+			1000,
+			"All chunks received"
+		)
 		var instanceServiceId: int
 		var instanceId: String
 		var peerKey: String
