@@ -95,6 +95,7 @@ func _on_client_disconnected(id: int, clean_close := false) -> void:
 
 
 func _on_data_received(client_id: int) -> void:
+	# print("Data received from client ", client_id)
 	var packet: PoolByteArray = _ws.get_peer(client_id).get_packet()
 	var string = packet.get_string_from_utf8()
 	# For testing purposes only, remove these lines later.
@@ -125,7 +126,12 @@ func _on_data_received(client_id: int) -> void:
 	_incoming[packet_id][chunk_id] = chunk
 	# Decode once we've received all the chunks
 	if _incoming[packet_id].size() == total_chunks:
-		print("Received all chunks for packet ", packet_id)
+		# print("Received all chunks for packet ", packet_id)
+		_ws.disconnect_peer(
+			client_id,
+			1000,
+			"All chunks received"
+		)
 		var instanceServiceId: int
 		var instanceId: String
 		var peerKey: String
@@ -162,7 +168,6 @@ func _decode(packet_id: int, client_id: int) -> void:
 	if _incoming[packet_id].has("metadata"):
 		data["metadata"] = _incoming[packet_id]["metadata"]
 	emit_signal("data_received", client_id, data)
-
 
 func _on_client_close_request(id: int, code: int, reason: String) -> void:
 	print("Client close request ", id, " reason: ", reason)
