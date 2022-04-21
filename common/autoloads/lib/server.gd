@@ -127,6 +127,8 @@ func _on_data_received(client_id: int) -> void:
 	# Decode once we've received all the chunks
 	if _incoming[packet_id].size() == total_chunks:
 		# print("Received all chunks for packet ", packet_id)
+		# This line is perhaps not needed --- I had issues with easywsclient which may need to be
+		# dealt with some other way later.
 		_ws.disconnect_peer(
 			client_id,
 			1000,
@@ -137,13 +139,30 @@ func _on_data_received(client_id: int) -> void:
 		var peerKey: String
 		if data.has("instanceServiceId"):
 			print("Request is from Kafka so attaching metadata.")
+			# this id keeps track of where in the bookkeeping subsystem we store the data; this is important
+			# for the consumer of the bookkeeping subsystem which will direct the payload to the instance service,
+			# to ultimately persist this information in S3 while keeping a pointer to that reference in postgres.
 			instanceServiceId = data["instanceServiceId"]
+			# we need the instanceId to identify which instance to broadcast to on return to the signalling server
 			instanceId = data["instanceId"]
+			# we need the peerKey to identify which peer originated the request on return to the signalling server
 			peerKey = data["peerKey"]
+			var ingress_metadata = data["metadata"]
+			# make sure that we extract the parameters for the procgen algorithm from the ingress metadata,
+			# as well as our desired target transform information (position and rotation)
+			# the target transform information will inform the client as to where to render the output work from Protongraph.
+			# the procgen parameters will be used to configure the way the algorithm is run within Protongraph.
+			var stringifiedGraphParameters = ingress_metadata["stringifiedGraphParameters"]
+			var stringifiedTargetPosition = ingress_metadata["stringifiedTargetPosition"]
+			var stringifiedTargetRotation = ingress_metadata["stringifiedTargetRotation"]
+			# make sure that we append the salient ingress metadata to the egress metadata
 			_incoming[packet_id]["metadata"] = {
 				"instanceServiceId": instanceServiceId,
 				"instanceId": instanceId,
-				"peerKey": peerKey
+				"peerKey": peerKey,
+				"stringifiedGraphParameters": stringifiedGraphParameters,
+				"stringifiedTargetPosition": stringifiedTargetPosition,
+				"stringifiedTargetRotation": stringifiedTargetRotation
 			}
 		_decode(packet_id, client_id)
 
@@ -166,8 +185,9 @@ func _decode(packet_id: int, client_id: int) -> void:
 
 	var data = DictUtil.fix_types(json.result)
 	if _incoming[packet_id].has("metadata"):
+		# overwrite the ingress metadata attribute
 		data["metadata"] = _incoming[packet_id]["metadata"]
 	emit_signal("data_received", client_id, data)
 
-func _on_client_close_request(id: int, code: int, reason: String) -> void:
+func _on_client_close_request(id: int, _code: int, reason: String) -> void:
 	print("Client close request ", id, " reason: ", reason)
